@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EmergencyBanner from '../components/EmergencyBanner.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const firmName = 'Schlüsseldienst Schmidt';
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+
+const title = `Schlüsseldienst FAQ – Häufige Fragen & Antworten`;
+const description = `Häufige Fragen zu Türöffnung, Schlossservice, Einbruchschutz und Schließanlagen von Schlüsseldienst Schmidt. 24h Notdienst — wir antworten direkt.`;
+
+interface FaqItem { question: string; answer: string; category: string; }
+
+const faqs: FaqItem[] = [
+  // Notdienst & Reaktionszeit
+  { category: 'Notdienst & Reaktionszeit', question: 'Wie schnell ist der Schlüsseldienst vor Ort?', answer: 'Unser Schlüsseldienst ist im Notfall schnell für Sie im Einsatz. Je nach Verkehrslage, Tageszeit und Ihrem Standort trifft ein Monteur häufig innerhalb von unter 15 Minuten bei Ihnen ein.' },
+  { category: 'Notdienst & Reaktionszeit', question: 'Ist der Schlüsseldienst rund um die Uhr erreichbar?', answer: 'Ja. Unser Schlüsseldienst ist 24 Stunden am Tag, 7 Tage die Woche für Sie erreichbar – auch an Sonn- und Feiertagen.' },
+  // Kosten & Zahlung
+  { category: 'Kosten & Zahlung', question: 'Was kostet eine Türöffnung?', answer: 'Die Kosten für eine Türöffnung hängen von verschiedenen Faktoren ab, beispielsweise von der Art der Tür, dem Schloss, dem Zeitpunkt des Einsatzes sowie dem benötigten Arbeitsaufwand. Vor Beginn der Arbeiten informieren wir Sie transparent über die voraussichtlichen Kosten.' },
+  { category: 'Kosten & Zahlung', question: 'Welche Zahlungsmöglichkeiten gibt es?', answer: 'Je nach Einsatz können Sie bequem bar oder mit EC- bzw. Kreditkarte bezahlen. Fragen Sie unseren Monteur gerne nach den verfügbaren Zahlungsmöglichkeiten.' },
+  // Türöffnung
+  { category: 'Türöffnung', question: 'Kann eine zugefallene Tür beschädigungsfrei geöffnet werden?', answer: 'In den meisten Fällen ja. Unsere Monteure verwenden professionelle Öffnungstechniken, um Türen möglichst beschädigungsfrei zu öffnen. Sollte ein Austausch des Schlosses erforderlich sein, informieren wir Sie selbstverständlich vorab.' },
+  { category: 'Türöffnung', question: 'Was soll ich tun, wenn ich mich ausgesperrt habe?', answer: 'Bewahren Sie Ruhe und versuchen Sie nicht, die Tür gewaltsam zu öffnen. Kontaktieren Sie unseren Schlüsseldienst, schildern Sie Ihre Situation und wir schicken schnellstmöglich einen Monteur zu Ihnen.' },
+  { category: 'Türöffnung', question: 'Muss ich nachweisen, dass ich in der Wohnung wohne?', answer: 'Ja. Aus Sicherheitsgründen öffnen wir Türen nur für berechtigte Personen. Falls sich Ihr Ausweis in der Wohnung befindet, kann die Identitätsprüfung nach der Türöffnung erfolgen.' },
+  { category: 'Türöffnung', question: 'Warum sollte ich einen professionellen Schlüsseldienst beauftragen?', answer: 'Ein professioneller Schlüsseldienst verfügt über das notwendige Fachwissen und Spezialwerkzeug, um Türen möglichst beschädigungsfrei zu öffnen. Dadurch vermeiden Sie unnötige Schäden und profitieren von einer sicheren und fachgerechten Lösung.' },
+  // Schlösser & Schlossservice
+  { category: 'Schlösser & Schlossservice', question: 'Können Sie auch defekte oder beschädigte Schlösser austauschen?', answer: 'Ja. Wir tauschen beschädigte, verschlissene oder veraltete Schlösser fachgerecht aus und beraten Sie auf Wunsch zu modernen Sicherheitslösungen.' },
+  { category: 'Schlösser & Schlossservice', question: 'Bieten Sie Schlosswechsel nach einem Umzug an?', answer: 'Ja. Nach einem Umzug empfiehlt es sich, das Türschloss auszutauschen. So stellen Sie sicher, dass ausschließlich Sie und berechtigte Personen Zugang zu Ihrer Immobilie haben.' },
+  { category: 'Schlösser & Schlossservice', question: 'Welche Schlösser können Sie öffnen oder austauschen?', answer: 'Unsere Monteure arbeiten mit den meisten gängigen Türschlössern, Profilzylindern, Sicherheitsschlössern, Mehrfachverriegelungen sowie vielen weiteren Schließsystemen.' },
+  { category: 'Schlösser & Schlossservice', question: 'Können Sie einen abgebrochenen Schlüssel aus dem Schloss entfernen?', answer: 'Ja. Mit speziellem Werkzeug entfernen wir abgebrochene Schlüssel schonend aus dem Schloss und prüfen anschließend, ob das Schloss weiterhin einwandfrei funktioniert.' },
+  { category: 'Schlösser & Schlossservice', question: 'Reparieren Sie Schlösser oder werden sie immer ersetzt?', answer: 'Wenn eine Reparatur technisch sinnvoll und wirtschaftlich ist, setzen wir das vorhandene Schloss instand. Ist ein Austausch die bessere Lösung, informieren wir Sie vor Beginn der Arbeiten.' },
+  // Einbruchschutz & Sicherheit
+  { category: 'Einbruchschutz & Sicherheit', question: 'Helfen Sie auch nach einem Einbruch?', answer: 'Ja. Nach einem Einbruch sichern wir Ihre Tür und Schlösser und beraten Sie zu geeigneten Maßnahmen für einen verbesserten Einbruchschutz.' },
+  { category: 'Einbruchschutz & Sicherheit', question: 'Bieten Sie Einbruchschutz und Sicherheitslösungen an?', answer: 'Ja. Wir beraten Sie individuell zum Thema Einbruchschutz und installieren auf Wunsch hochwertige Sicherheitszylinder, Zusatzschlösser sowie weitere Sicherungstechnik.' },
+  // Gewerbliche Kunden
+  { category: 'Gewerbliche Kunden', question: 'Installieren Sie Schließanlagen?', answer: 'Ja. Wir installieren und warten Schließanlagen für Mehrfamilienhäuser, Unternehmen, Gewerbeobjekte und öffentliche Einrichtungen.' },
+  { category: 'Gewerbliche Kunden', question: 'Arbeiten Sie auch für Unternehmen und Hausverwaltungen?', answer: 'Ja. Wir betreuen Privatkunden, Unternehmen, Hausverwaltungen, Vermieter sowie Gewerbebetriebe und bieten sowohl Notöffnungen als auch geplante Sicherheitslösungen an.' },
+  // Einsatzgebiet & Beauftragung
+  { category: 'Einsatzgebiet & Beauftragung', question: 'In welchen Regionen sind Sie tätig?', answer: 'Unser Schlüsseldienst ist in zahlreichen Städten und Gemeinden im Einsatz. Kontaktieren Sie uns telefonisch – wir prüfen sofort die Verfügbarkeit eines Monteurs in Ihrer Nähe.' },
+  { category: 'Einsatzgebiet & Beauftragung', question: 'Wie kann ich einen Schlüsseldienst beauftragen?', answer: 'Die Beauftragung erfolgt ausschließlich telefonisch — ein Kontaktformular bieten wir bewusst nicht an. Rufen Sie uns an, schildern Sie Standort und Anliegen, und wir organisieren schnellstmöglich einen passenden Monteur. Den Preis nennen wir Ihnen direkt im Gespräch.' },
+  { category: 'Einsatzgebiet & Beauftragung', question: 'Wie erkenne ich einen seriösen Schlüsseldienst?', answer: 'Seriöse Merkmale: Preisnennung vor dem Einsatz, ausgebildeter Techniker, zerstörungsfreie Öffnung, vollständige Rechnung nach dem Einsatz, Identitätsprüfung vor der Öffnung. Warnsignale: Preis erst nach der Arbeit, sofortige Empfehlung für Zusatzleistungen, keine Rechnung.' },
+  { category: 'Einsatzgebiet & Beauftragung', question: 'Gibt es eine Garantie auf Ihre Arbeiten?', answer: 'Wir legen großen Wert auf eine fachgerechte Ausführung unserer Arbeiten. Sollten Sie nach dem Einsatz Fragen oder Anliegen haben, steht Ihnen unser Kundenservice zur Verfügung.' },
+];
+
+const categories = [...new Set(faqs.map(f => f.category))];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(item => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+
+<BaseLayout title={title} description={description} canonical={`${siteUrl}/faq`} schema={faqSchema}>
+  <EmergencyBanner />
+  <Header />
+
+  <!-- Page Hero -->
+  <section class="bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 text-white py-16 md:py-24">
+    <div class="container-main text-center max-w-2xl">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-gray-400 text-xs font-medium mb-7 tracking-wide uppercase">
+        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+        Notdienst aktiv — sofort erreichbar
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black mb-4 tracking-tight">Häufige Fragen</h1>
+      <p class="text-base text-gray-400 leading-relaxed">Antworten zu Türöffnung, Schlossservice, Einbruchschutz und mehr.</p>
+    </div>
+  </section>
+
+  <main class="py-16">
+    <div class="container-main max-w-3xl">
+
+      {categories.map(cat => (
+        <div class="mb-12">
+          <h2 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5 pb-3 border-b border-gray-100">{cat}</h2>
+          <div class="space-y-4">
+            {faqs.filter(f => f.category === cat).map((item, i) => (
+              <div class="border border-gray-200 rounded-xl overflow-hidden">
+                <button
+                  class="w-full text-left px-6 py-5 font-semibold text-gray-900 flex justify-between items-center hover:bg-gray-50 transition-colors faq-toggle"
+                  aria-expanded="false"
+                  aria-controls={`faq-${cat}-${i}`}
+                  id={`faqbtn-${cat}-${i}`}
+                >
+                  <span>{item.question}</span>
+                  <svg class="h-5 w-5 text-orange-600 flex-shrink-0 transition-transform faq-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div id={`faq-${cat}-${i}`} class="px-6 pb-5 text-gray-600 text-sm leading-relaxed hidden">
+                  {item.answer}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div class="text-center mt-12 bg-orange-50 rounded-2xl p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-3">Ihre Frage nicht dabei?</h2>
+        <p class="text-gray-600 mb-6">Rufen Sie uns jetzt an — wir antworten sofort.</p>
+        <a href={`tel:${phone}`} class="btn-call justify-center inline-flex">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+          </svg>
+          {phoneDisplay}
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<script>
+  document.querySelectorAll('.faq-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      const id = btn.getAttribute('aria-controls');
+      const answer = document.getElementById(id!);
+      const icon = btn.querySelector('.faq-icon') as HTMLElement;
+      btn.setAttribute('aria-expanded', String(!expanded));
+      answer?.classList.toggle('hidden', expanded);
+      icon?.style.setProperty('transform', expanded ? '' : 'rotate(180deg)');
+    });
+  });
+</script>

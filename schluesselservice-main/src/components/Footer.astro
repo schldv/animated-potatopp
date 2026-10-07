@@ -1,0 +1,91 @@
+---
+import { CITY_SERVICES } from '../data/services';
+
+interface Props {
+  city?: string;
+  /** Gesetzt auf Stadtseiten und deren Leistungs-Unterseiten. */
+  citySlug?: string;
+}
+
+const { city, citySlug } = Astro.props;
+
+// Im Stadtkontext auf die Unterseiten dieser Stadt verlinken statt auf die
+// generischen Leistungsseiten — sonst fließt die interne Linkkraft an den
+// Stadtseiten vorbei.
+const serviceLinks = CITY_SERVICES.map(s => ({
+  href: citySlug ? `/${citySlug}/${s.slug}` : `/leistungen/${s.slug}`,
+  label: s.shortName,
+}));
+const allServicesHref = citySlug ? `/${citySlug}` : '/leistungen';
+const allServicesLabel = citySlug ? `Alle Leistungen in ${city}` : 'Alle Leistungen';
+
+// FAQ und Kontakt bleiben im Stadtkontext. Impressum und Datenschutz sind
+// rechtliche Pflichtseiten und bewusst global (zudem noindex).
+const faqHref = citySlug ? `/${citySlug}/faq` : '/faq';
+const kontaktHref = citySlug ? `/${citySlug}/kontakt` : '/kontakt';
+// Bewusst keine Städte-Querverlinkung im Footer: Stadtseiten sollen nicht
+// untereinander verlinkt sein.
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-gray-950 text-gray-400 mt-20">
+  <div class="container-main py-14">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
+
+      <!-- Firma -->
+      <div>
+        <div class="flex items-center gap-2.5 mb-5">
+          <div class="w-7 h-7 bg-orange-600 rounded-md flex items-center justify-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+          </div>
+          <span class="text-white font-bold text-sm">Schlüsseldienst Schmidt</span>
+        </div>
+        <address class="not-italic text-sm space-y-1 text-gray-500">
+          {city && (
+            <p class="mt-3 text-gray-400">
+              Einsatzgebiet: <span class="text-gray-300">{city} & Umgebung</span>
+            </p>
+          )}
+          <p class="mt-4">
+            <a href={`tel:${phone}`} class="text-orange-500 hover:text-orange-400 font-bold text-base transition-colors">
+              {phoneDisplay}
+            </a>
+          </p>
+          <p class="text-xs text-gray-600 mt-1">24h Notdienst — täglich, auch an Feiertagen</p>
+        </address>
+      </div>
+
+      <!-- Leistungen -->
+      <div>
+        <h3 class="text-white font-semibold text-sm mb-4 uppercase tracking-wide">Leistungen</h3>
+        <ul class="space-y-2 text-sm">
+          {serviceLinks.map(l => (
+            <li><a href={l.href} class="hover:text-white transition-colors">{l.label}</a></li>
+          ))}
+          <li><a href={allServicesHref} class="hover:text-white transition-colors">{allServicesLabel}</a></li>
+        </ul>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <h3 class="text-white font-semibold text-sm mb-4 uppercase tracking-wide">Informationen</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href={faqHref} class="hover:text-white transition-colors">Häufige Fragen</a></li>
+          <li><a href={kontaktHref} class="hover:text-white transition-colors">Kontakt</a></li>
+          <li><a href={citySlug ? `/${citySlug}/impressum` : '/impressum'} class="hover:text-white transition-colors">Impressum</a></li>
+          <li><a href="/datenschutz" class="hover:text-white transition-colors">Datenschutz</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="border-t border-gray-800 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-600">
+      <p>&copy; {year} Schlüsseldienst Schmidt. Alle Rechte vorbehalten.</p>
+      <p>IHK-Mitglied · Haftpflichtversichert · Ausgebildete Schlosser</p>
+    </div>
+  </div>
+</footer>

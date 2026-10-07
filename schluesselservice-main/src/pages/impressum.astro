@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EmergencyBanner from '../components/EmergencyBanner.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+// Gleiche Schreibweise wie überall sonst — sonst greift der Platzhalter-Ersatz hier nicht.
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const title = 'Impressum | Schlüsseldienst Schmidt';
+const description = 'Impressum und Pflichtangaben gemäß §5 TMG der Schlüsseldienst Schmidt, Essen.';
+---
+
+<BaseLayout title={title} description={description} canonical={`${siteUrl}/impressum`} noindex={true}>
+  <EmergencyBanner />
+  <Header />
+
+  <main class="py-16">
+    <div class="container-main max-w-2xl">
+      <h1 class="section-title mb-8">Impressum</h1>
+
+      <section class="space-y-6 text-gray-700 text-sm leading-relaxed">
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Angaben gemäß §5 TMG</h2>
+          <address class="not-italic space-y-1">
+            <p class="font-semibold">Schlüsseldienst Schmidt</p>
+            <p>Im Mediapark 5</p>
+            <p>50670 Köln</p>
+            <p>Deutschland</p>
+          </address>
+        </div>
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Kontakt</h2>
+          <p>Telefon: <a href={`tel:${phone}`} class="text-orange-600">{phoneDisplay}</a></p>
+          <p>E-Mail: <a href="mailto:service@schluesseldienst-schmidt.de" class="text-orange-600">service@schluesseldienst-schmidt.de</a></p>
+        </div>
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Vertretungsberechtigte Person</h2>
+          <p>Geschäftsführer: Domenik Schmidt</p>
+        </div>
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Berufsbezeichnung und berufsrechtliche Regelungen</h2>
+          <p>Berufsbezeichnung: Schlosserei / Sicherheitstechnik</p>
+          <p>Zuständige Kammer: Handwerkskammer zu Köln</p>
+        </div>
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Haftung für Inhalte</h2>
+          <p>Als Diensteanbieter sind wir gemäß §7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.</p>
+        </div>
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Haftung für Links</h2>
+          <p>Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen.</p>
+        </div>
+
+        <div>
+          <h2 class="font-bold text-gray-900 text-base mb-2">Urheberrecht</h2>
+          <p>Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.</p>
+        </div>
+
+        <p class="text-xs text-gray-400 mt-8">Stand: {new Date().getFullYear()}</p>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

@@ -1,0 +1,171 @@
+---
+import '../styles/global.css';
+import { jsonLd } from '../lib/jsonld';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical?: string;
+  city?: string;
+  schema?: object;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  city = 'Essen',
+  schema,
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+const firmName = 'Schlüsseldienst Schmidt';
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+// Vollständige Anschrift steht ausschließlich im Impressum.
+const address = {
+  streetAddress: 'Im Mediapark 5',
+  postalCode: '50670',
+  city: 'Köln',
+  region: 'Nordrhein-Westfalen',
+  country: 'DE',
+};
+
+// Astro baut mit build.format 'directory', ausgeliefert wird also /pfad/ .
+// Die Sitemap schreibt den Trailing Slash — der Canonical muss dieselbe Form
+// nennen, sonst deklariert die Seite eine andere URL als die eingereichte.
+const canonicalUrlObject = new URL(canonical ?? Astro.url.href);
+if (!/\.[a-z0-9]+$/i.test(canonicalUrlObject.pathname) && !canonicalUrlObject.pathname.endsWith('/')) {
+  canonicalUrlObject.pathname += '/';
+}
+// .href normalisiert zusätzlich die Schreibweise der Domain — sonst weicht der
+// Canonical von der Sitemap ab, die Astro klein schreibt.
+const canonicalUrl = canonicalUrlObject.href;
+const ogImage = `${siteUrl}/images/og-default.jpg`;
+
+// Herkunftsnachweis für den Fall einer 1:1-Kopie der Website ("Canary").
+// Der Token hat keinen funktionalen Zweck und keinen Grund, auf einer fremden
+// Domain aufzutauchen — findet er sich dort, ist die Seite wörtlich kopiert.
+// Damit er als Nachweis taugt, muss er STABIL bleiben: niemals neu generieren.
+// Suche nach einem Klon:  curl -s https://verdaechtige-domain.de | grep 64bf8f6b2659427c
+const ORIGIN_TOKEN = '64bf8f6b2659427c';
+const buildYear = new Date().getFullYear();
+
+// "--" und ">" würden einen HTML-Kommentar vorzeitig beenden.
+const safeForComment = (v: string) => v.replace(/--+/g, '-').replace(/>/g, '');
+
+const originNotice = `<!--
+      © ${buildYear} ${safeForComment(firmName)} — alle Inhalte urheberrechtlich geschützt.
+      Original: ${safeForComment(canonicalUrl)}
+      Texte, Struktur und Quellcode dürfen nicht ohne schriftliche Zustimmung
+      übernommen werden (§§ 2, 87a UrhG).
+    -->`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['Locksmith', 'LocalBusiness'],
+  name: firmName,
+  telephone: phone,
+  url: siteUrl,
+  image: ogImage,
+  priceRange: '€€',
+  openingHours: 'Mo-Su 00:00-24:00',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: address.streetAddress,
+    postalCode: address.postalCode,
+    addressLocality: address.city,
+    addressRegion: address.region,
+    addressCountry: address.country,
+  },
+  areaServed: {
+    '@type': 'GeoCircle',
+    geoMidpoint: {
+      '@type': 'GeoCoordinates',
+      latitude: 51.4556,
+      longitude: 7.0116,
+    },
+    geoRadius: '100000',
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Schlüsseldienst Leistungen',
+    itemListElement: [
+      { name: 'Türöffnung 24h Notdienst', description: 'Zerstörungsfreie Türöffnung, im Essener Stadtgebiet in unter 15 Minuten vor Ort' },
+      { name: 'Tresoröffnung', description: 'Öffnung von Tresoren, Safes und Wertschutzschränken' },
+      { name: 'Schlossaustausch & Schlossservice', description: 'Zylindertausch, Schlossreparatur, Entfernung abgebrochener Schlüssel' },
+      { name: 'Einbruchschutz', description: 'Beratung und Nachrüstung von Sicherheitstechnik an Türen und Fenstern' },
+      { name: 'Schließanlagen', description: 'Planung, Montage und Wartung von Schließanlagen' },
+    ].map(s => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.name, description: s.description },
+    })),
+  },
+};
+
+const mergedSchema = schema ?? localBusinessSchema;
+---
+
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <Fragment set:html={originNotice} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Hreflang -->
+    <link rel="alternate" hreflang="de-DE" href={canonicalUrl} />
+    <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content={firmName} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json" set:html={jsonLd(mergedSchema)} />
+
+    <!-- WebSite Schema -->
+    <script type="application/ld+json" set:html={jsonLd({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: firmName,
+      url: siteUrl,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${siteUrl}/?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    })} />
+
+    <!-- Seitenspezifisches JSON-LD (z.B. BreadcrumbList) -->
+    <slot name="head" />
+
+    <!-- Performance: preconnect nothing external (DSGVO) -->
+  </head>
+  <body class="bg-white text-gray-900 antialiased">
+    <slot />
+    <Fragment set:html={`<!-- b:${ORIGIN_TOKEN} -->`} />
+  </body>
+</html>

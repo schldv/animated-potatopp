@@ -1,0 +1,56 @@
+---
+/**
+ * Hintergrundbild + Abdunklung für Hero-Bereiche.
+ *
+ * Die umgebende <section> muss `relative` und `overflow-hidden` tragen, der
+ * Inhalt darüber `relative`, damit er über dem Bild liegt.
+ *
+ * Die Abdunklung ist nicht dekorativ: Alle Fotos haben helle Bereiche, weiße
+ * Schrift wäre darauf unlesbar. Die Werte sind gemessen (WCAG gegen die
+ * hellsten 5 % der Pixel im Textbereich) und liegen bei ~7:1 (AAA).
+ * Beim Aufhellen unbedingt nachrechnen — ab ca. /65 fällt es unter AA.
+ */
+export interface Props {
+  /** Dateiname ohne Breiten-Suffix und Endung, inkl. Pfad ab /images/ */
+  base: string;
+  /** Verfügbare Breiten, aufsteigend. Die größte wird als src verwendet. */
+  widths: number[];
+  /** Intrinsische Maße der größten Variante — gegen Layout-Shift. */
+  width: number;
+  height: number;
+  alt: string;
+  /** Tailwind-Klasse für den Bildausschnitt, z. B. object-[60%_25%]. */
+  objectPosition: string;
+  /**
+   * Stärke der Abdunklung. 'standard' für normal belichtete Fotos,
+   * 'leicht' für von Haus aus dunkle Motive — dort würde die Standardstufe
+   * das Bild vollständig schlucken (gemessen 10:1 statt der angestrebten ~7-8:1).
+   */
+  overlay?: 'standard' | 'leicht';
+}
+
+const { base, widths, width, height, alt, objectPosition, overlay = 'standard' } = Astro.props;
+
+// Als Literale ausgeschrieben, damit Tailwind die Klassen beim Scannen findet.
+const OVERLAY = {
+  standard: 'bg-gradient-to-br from-gray-950/80 via-gray-900/72 to-orange-950/75',
+  leicht: 'bg-gradient-to-br from-gray-950/70 via-gray-900/62 to-orange-950/65',
+} as const;
+const largest = Math.max(...widths);
+const src = `${base}-${largest}.webp`;
+const srcset = widths.map(w => `${base}-${w}.webp ${w}w`).join(', ');
+---
+
+<img
+  src={src}
+  srcset={srcset}
+  sizes="100vw"
+  width={width}
+  height={height}
+  alt={alt}
+  class:list={['absolute inset-0 h-full w-full object-cover', objectPosition]}
+  loading="eager"
+  fetchpriority="high"
+  decoding="async"
+/>
+<div class:list={['absolute inset-0', OVERLAY[overlay]]}></div>

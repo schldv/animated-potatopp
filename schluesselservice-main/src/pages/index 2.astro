@@ -1,0 +1,374 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EmergencyBanner from '../components/EmergencyBanner.astro';
+import Header from '../components/Header.astro';
+import HeroSection from '../components/HeroSection.astro';
+import TrustBar from '../components/TrustBar.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import FaqAccordion from '../components/FaqAccordion.astro';
+import Reviews from '../components/Reviews.astro';
+import Footer from '../components/Footer.astro';
+import { CITIES } from '../data/cities';
+import { HERO_IMAGES, heroImageForCity } from '../data/heroImages';
+
+const firmName = 'Schlüsseldienst Schmidt';
+const phone = '+49 201 000000';
+const phoneDisplay = '0201 000000';
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+
+const title = `Schlüsseldienst Essen 24h – Türöffnung Notdienst | Schmidt`;
+const description = `Ausgesperrt in Essen? Schlüsselnotdienst 24h: zerstörungsfreie Türöffnung, vor Ort in unter 15 Min., Preisauskunft vorab. Jetzt: ${phoneDisplay}`;
+
+const homepageSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['Locksmith', 'LocalBusiness'],
+  name: firmName,
+  telephone: phone,
+  url: siteUrl,
+  priceRange: '€€',
+  openingHours: 'Mo-Su 00:00-24:00',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Essen',
+    addressRegion: 'Nordrhein-Westfalen',
+    addressCountry: 'DE',
+  },
+  areaServed: {
+    '@type': 'GeoCircle',
+    geoMidpoint: {
+      '@type': 'GeoCoordinates',
+      latitude: 51.4556,
+      longitude: 7.0116,
+    },
+    geoRadius: '100000',
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Schlüsseldienst-Leistungen',
+    itemListElement: [
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Türöffnung 24h Notdienst',
+          description: 'Zerstörungsfreie Türöffnung bei Aussperrung, 24h täglich, in unter 15 Minuten.',
+        },
+      },
+      {
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: 'Tresoröffnung',
+          description: 'Fachgerechte Öffnung von Tresoren, Safes und Wertschutzschränken bei verlorener Kombination, defektem Schloss oder blockiertem Riegelwerk — möglichst zerstörungsfrei.',
+        },
+      },
+    ],
+  },
+};
+
+const faqItems = [
+  {
+    question: 'Wie schnell ist der Schlüsseldienst in Essen vor Ort?',
+    answer: 'Im Essener Stadtgebiet trifft unser Monteur häufig innerhalb von unter 15 Minuten bei Ihnen ein. Unser Notdienst ist 24 Stunden täglich, 365 Tage im Jahr erreichbar — auch an Weihnachten, Silvester und allen Feiertagen.',
+  },
+  {
+    question: 'Was soll ich tun, wenn ich ausgesperrt bin?',
+    answer: `Bewahren Sie Ruhe und versuchen Sie nicht, die Tür gewaltsam zu öffnen. Rufen Sie uns an, schildern Sie Ihre Situation und legen Sie einen Lichtbildausweis bereit — wir schicken schnellstmöglich einen Monteur zu Ihnen.`,
+  },
+  {
+    question: 'Kann eine zugefallene Tür beschädigungsfrei geöffnet werden?',
+    answer: 'In den meisten Fällen ja. Unsere Techniker verwenden professionelle Öffnungstechniken, um Türen möglichst beschädigungsfrei zu öffnen. Tür und Schloss bleiben dabei vollständig intakt.',
+  },
+  {
+    question: 'Was kostet eine Türöffnung?',
+    answer: 'Die Kosten hängen von der Art der Tür, dem Schloss, dem Zeitpunkt und dem Aufwand ab. Vor Beginn der Arbeiten informieren wir Sie transparent über die voraussichtlichen Kosten.',
+  },
+  {
+    question: 'Bieten Sie auch Schlossaustausch und Einbruchschutz an?',
+    answer: 'Ja. Neben der Notöffnung tauschen wir Schlösser aus, entfernen abgebrochene Schlüssel, öffnen Tresore und Wertschutzschränke, beraten zu Einbruchschutz und installieren auf Wunsch Sicherheitszylinder, Zusatzschlösser und Schließanlagen.',
+  },
+  {
+    question: 'Woran erkenne ich einen seriösen Schlüsseldienst?',
+    answer: 'Ein seriöser Schlüsseldienst nennt den Preis immer vor dem Einsatz, öffnet zerstörungsfrei, führt eine Identitätsprüfung durch und stellt eine vollständige Rechnung aus. Vorsicht bei Anbietern, die den Preis erst nach der Arbeit nennen oder Zusatzleistungen aufdrängen.',
+  },
+  {
+    question: 'Sind Sie auch nachts, an Feiertagen und am Wochenende erreichbar?',
+    answer: 'Ja. Unser Notdienst ist 24 Stunden täglich, 7 Tage die Woche, 365 Tage im Jahr erreichbar — einschließlich Heiligabend, Neujahr, Ostersonntag und allen gesetzlichen Feiertagen in Nordrhein-Westfalen.',
+  },
+  {
+    question: 'Muss ich nachweisen, dass ich die Tür öffnen darf?',
+    answer: 'Ja. Wir öffnen Türen ausschließlich für berechtigte Personen. Halten Sie einen gültigen Lichtbildausweis bereit — Personalausweis oder Reisepass. Im Zweifelsfall hilft auch ein Mietvertrag oder eine Stromrechnung.',
+  },
+  {
+    question: 'Welche Zahlungsmöglichkeiten gibt es?',
+    answer: 'Je nach Einsatz können Sie bequem bar oder mit EC- bzw. Kreditkarte bezahlen. Sie erhalten nach dem Einsatz immer eine vollständige Rechnung.',
+  },
+  {
+    question: 'Was ist der Unterschied zwischen Schlüsseldienst, Schlüsselnotdienst und Aufsperrdienst?',
+    answer: 'Im Alltag meinen alle drei Begriffe dasselbe. "Schlüsseldienst" ist der Oberbegriff für den Fachbetrieb, "Schlüsselnotdienst" betont die Erreichbarkeit rund um die Uhr, und "Aufsperrdienst" ist vor allem im süddeutschen und österreichischen Sprachraum gebräuchlich. Bei uns erreichen Sie alle drei unter derselben Nummer.',
+  },
+  {
+    question: 'In welchen Städten sind Sie tätig?',
+    answer: 'Wir decken Essen und alle Städte im 100km-Umkreis in NRW ab — das gesamte Ruhrgebiet (Dortmund, Bochum, Gelsenkirchen, Duisburg u.v.a.), Düsseldorf, Köln, Wuppertal, Münster und über 70 weitere Städte.',
+  },
+];
+
+// ALLE Städte verlinken, nicht nur eine Auswahl: Jede Stadt bildet mit ihren
+// Leistungs-, FAQ- und Kontaktseiten eine in sich verlinkte Insel. Fehlt der
+// Link von hier, ist die ganze Insel per Klick unerreichbar (zuletzt 352 Seiten)
+// und wird nur über die Sitemap gefunden — entsprechend schwach gecrawlt.
+// Städte untereinander bleiben unverlinkt, das betrifft nur diesen Einstieg.
+const topCities = CITIES;
+
+// Startseite und /essen sind beide Essen-Seiten. Sie sollen sich auch optisch
+// unterscheiden, deshalb hier gezielt ein anderes Motiv als das, welches die
+// Zuordnung für /essen liefert.
+const essenImage = heroImageForCity('essen');
+const homeHeroImage =
+  HERO_IMAGES.find(i => i.base !== essenImage.base && i.base.includes('im-einsatz')) ??
+  HERO_IMAGES.find(i => i.base !== essenImage.base)!;
+---
+
+<BaseLayout title={title} description={description} canonical={siteUrl} schema={homepageSchema}>
+  <EmergencyBanner />
+  <Header />
+  <HeroSection
+    city="Essen"
+    subtitle="Ausgesperrt in Essen oder NRW? Wir öffnen Ihre Tür zerstörungsfrei — in unter 15 Minuten. Preise ab 79€."
+    image={homeHeroImage}
+  />
+  <TrustBar />
+
+  <!-- E-E-A-T / Intro -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-4xl">
+      <h2 class="section-title">Ihr 24h-Schlüsseldienst in Essen und ganz NRW</h2>
+      <div class="text-gray-700 space-y-4 text-lg leading-relaxed">
+        <p>
+          <strong>Schlüsseldienst Schmidt</strong> ist Ihr Notdienst-Spezialist für Türöffnungen in Essen und im gesamten Ruhrgebiet.
+          Unsere ausgebildeten Schlosser öffnen Wohnungstüren, Haustüren und Bürotüren
+          <strong>zerstörungsfrei</strong> — in der Regel in 2–10 Minuten, ohne jede Beschädigung an Tür oder Schloss.
+        </p>
+        <p>
+          Ob Sie nach einem <strong>Schlüsselnotdienst</strong> suchen, weil die Tür nachts zugefallen ist,
+          oder nach einem <strong>Aufsperrdienst</strong>, weil der Schlüssel verloren ging oder im Schloss
+          abgebrochen ist: Gemeint ist dieselbe Leistung. Wie eine
+          <a href="/leistungen/tueroeffnung" class="text-orange-600 font-semibold hover:underline">professionelle Türöffnung</a>
+          abläuft und was sie kostet, erklären wir Schritt für Schritt.
+        </p>
+        <p>
+          Wir sind im Essener Stadtgebiet <strong>in unter 15 Minuten vor Ort</strong>.
+          Sie erfahren den genauen Preis immer <em>vor</em> dem Einsatz — keine versteckten Gebühren, keine Nachforderungen.
+        </p>
+        <p>
+          Als IHK-Mitglied und gewerblich haftpflichtversicherter Fachbetrieb arbeiten wir nach klaren Standards:
+          Identitätsprüfung vor jedem Einsatz, vollständige Rechnung danach.
+          In über 95% aller Einsätze öffnen wir zerstörungsfrei — Tür und Schloss bleiben intakt.
+        </p>
+      </div>
+
+      <!-- KPI-Boxen -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+        {[
+          { value: '< 15 Min.', label: 'Reaktionszeit Essen' },
+          { value: 'Preis vorab', label: 'Transparente Kosten' },
+          { value: '> 95%', label: 'Zerstörungsfreie Öffnungen' },
+          { value: '24/7', label: '365 Tage erreichbar' },
+        ].map(item => (
+          <div class="text-center bg-orange-50 rounded-xl p-5 border border-orange-100">
+            <div class="text-2xl font-black text-orange-600">{item.value}</div>
+            <div class="text-sm text-gray-600 mt-1">{item.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Ausgesperrt-Checkliste -->
+  <section class="py-14 bg-gray-50">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title">Ausgesperrt? Das sind Ihre nächsten Schritte</h2>
+      <p class="text-gray-600 mb-8 text-lg">Ruhig bleiben — in wenigen Minuten ist alles erledigt. So gehen Sie richtig vor:</p>
+      <ol class="space-y-5">
+        {[
+          {
+            n: '1',
+            title: 'Ersatzschlüssel prüfen',
+            text: 'Gibt es einen Ersatzschlüssel bei Nachbarn, Familie, dem Vermieter oder Hausmeister? Das spart Zeit und Kosten.',
+          },
+          {
+            n: '2',
+            title: 'Seriösen Schlüsseldienst direkt anrufen',
+            text: `Rufen Sie ${phoneDisplay} an — ohne Umweg über Suchmaschinen-Anzeigen, die oft überteuerte Drittanbieter vermitteln.`,
+          },
+          {
+            n: '3',
+            title: 'Ausweis bereithalten',
+            text: 'Legen Sie Personalausweis oder Reisepass bereit. Die Identitätsprüfung ist Pflicht — sie schützt Sie und uns.',
+          },
+          {
+            n: '4',
+            title: 'Preis vor dem Einsatz bestätigen lassen',
+            text: 'Ein seriöser Schlüsseldienst nennt Ihnen den genauen Preis vor Beginn der Arbeit. Lehnen Sie Angebote ab, die erst nach der Öffnung abgerechnet werden.',
+          },
+          {
+            n: '5',
+            title: 'Rechnung nach der Öffnung annehmen',
+            text: 'Sie erhalten eine vollständige Rechnung. Bezahlen Sie erst nach erfolgreicher Öffnung und Erhalt der Quittung.',
+          },
+        ].map(item => (
+          <li class="flex gap-4 items-start">
+            <span class="flex-shrink-0 w-9 h-9 bg-orange-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              {item.n}
+            </span>
+            <div>
+              <strong class="text-gray-900 block mb-0.5">{item.title}</strong>
+              <span class="text-gray-600 text-sm leading-relaxed">{item.text}</span>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-6 text-sm text-gray-500 bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <strong>Wichtig:</strong> Versuchen Sie nicht, die Tür selbst mit Kreditkarte oder Draht aufzuhebeln — das beschädigt das Schloss und macht eine spätere professionelle Öffnung teurer oder unmöglich.
+      </p>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="py-14 bg-white">
+    <div class="container-main">
+      <h2 class="section-title text-center mb-4">Unsere Leistungen</h2>
+      <p class="text-center text-gray-600 mb-8 text-sm">Vom Notfall bis zur Sicherheitslösung — wir sind Ihr Ansprechpartner rund ums Schloss.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <ServiceCard
+          title="Türöffnung 24h Notdienst"
+          description="Ausgesperrt? Unsere ausgebildeten Schlosser öffnen Wohnungstüren, Haustüren und Bürotüren zerstörungsfrei — in unter 15 Minuten vor Ort."
+          icon="🚪"
+          href="/leistungen/tueroeffnung"
+        />
+        <ServiceCard
+          title="Schlossaustausch & Schlossservice"
+          description="Defektes Schloss, Umzug oder abgebrochener Schlüssel? Wir tauschen Schlösser fachgerecht aus und entfernen Fremdkörper schonend."
+          icon="🔒"
+          href="/leistungen/schlossaustausch"
+        />
+        <ServiceCard
+          title="Einbruchschutz"
+          description="Nach einem Einbruch oder zur Vorsorge: Wir beraten zu Sicherheitslösungen und installieren hochwertige Sicherheitszylinder und Zusatzschlösser."
+          icon="🛡️"
+          href="/leistungen/einbruchschutz"
+        />
+        <ServiceCard
+          title="Schließanlagen"
+          description="Für Mehrfamilienhäuser, Unternehmen und Hausverwaltungen: Wir installieren und warten professionelle Schließanlagen."
+          icon="🏢"
+          href="/leistungen/schliessanlagen"
+        />
+        <ServiceCard
+          title="Tresoröffnung"
+          description="Kombination vergessen, Schlüssel verloren oder Schloss defekt? Wir öffnen Tresore, Safes und Wertschutzschränke fachgerecht — möglichst zerstörungsfrei."
+          icon="🔐"
+          href="/leistungen/tresoroeffnung"
+        />
+      </div>
+      <p class="text-center mt-8">
+        <a href="/leistungen" class="text-orange-600 font-semibold hover:underline text-sm">Alle Leistungen im Überblick →</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- HowTo Ablauf (GEO-Signal) -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title text-center mb-10">So läuft ein Notfalleinsatz ab</h2>
+      <div class="space-y-6">
+        {[
+          {
+            step: '1',
+            title: 'Anruf & Preisauskunft',
+            text: `Sie rufen ${phoneDisplay} an. Wir fragen nach Adresse, Türtyp und Schloss und nennen Ihnen sofort den Preis — bevor wir losfahren.`,
+          },
+          {
+            step: '2',
+            title: 'Sofortige Anfahrt',
+            text: 'Der nächstgelegene Techniker fährt sofort zu Ihnen. Durchschnittliche Reaktionszeit im Essener Stadtgebiet: unter 15 Minuten.',
+          },
+          {
+            step: '3',
+            title: 'Identitätsprüfung vor Ort',
+            text: 'Zur Sicherheit aller Beteiligten weisen Sie sich mit einem Lichtbildausweis aus und bestätigen Ihre Berechtigung.',
+          },
+          {
+            step: '4',
+            title: 'Zerstörungsfreie Öffnung (2–10 Min.)',
+            text: 'Mit Picking-Set und Spezialwerkzeug öffnen wir Ihre Tür ohne jede Beschädigung — in der Regel in 2–10 Minuten.',
+          },
+          {
+            step: '5',
+            title: 'Bezahlung & Rechnung',
+            text: 'Sie zahlen den vorher genannten Preis (bar oder EC-Karte) und erhalten eine vollständige Rechnung mit Leistungsbeschreibung.',
+          },
+        ].map(item => (
+          <div class="flex gap-5">
+            <div class="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-black text-xl">
+              {item.step}
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 mb-1">{item.title}</h3>
+              <p class="text-gray-600 text-sm leading-relaxed">{item.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div class="mt-8 text-center">
+        <a href="/leistungen/tueroeffnung" class="text-orange-600 font-semibold hover:underline text-sm">
+          Detaillierten Ablauf, Preise und FAQ zur Türöffnung →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Städte-Übersicht -->
+  <section class="py-16 bg-white" id="einsatzgebiet">
+    <div class="container-main">
+      <h2 class="section-title text-center mb-4">Einsatzgebiet: {CITIES.length} Städte in NRW</h2>
+      <p class="text-center text-gray-600 mb-10">
+        Wählen Sie Ihre Stadt für lokale Reaktionszeiten und Informationen — oder sehen Sie,
+        <a href="/essen" class="text-orange-600 font-semibold hover:underline">in welchen Essener Stadtteilen wir unterwegs sind</a>.
+      </p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {topCities.map(city => (
+          <a
+            href={`/${city.slug}`}
+            class="bg-white border border-gray-200 rounded-lg p-3 text-center text-sm font-medium text-gray-700 hover:border-orange-400 hover:text-orange-600 transition-colors"
+          >
+            {city.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <Reviews />
+
+  <FaqAccordion items={faqItems} city="Essen" />
+  <!-- Telefon-CTA -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-2xl text-center">
+      <h2 class="section-title">Jetzt anrufen — wir sind sofort erreichbar</h2>
+      <p class="text-gray-600 mb-8 leading-relaxed">
+        Wir arbeiten ohne Kontaktformular: Schildern Sie uns Ihren Fall direkt am Telefon, dann erfahren Sie sofort,
+        wie schnell wir bei Ihnen sind und was der Einsatz kostet — verbindlich, bevor ein Techniker losfährt.
+      </p>
+      <a href={`tel:${phone}`} class="btn-call justify-center inline-flex">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+        {phoneDisplay}
+      </a>
+      <p class="mt-4 text-sm text-gray-500">24 Stunden täglich, 365 Tage im Jahr — auch nachts und an Feiertagen</p>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

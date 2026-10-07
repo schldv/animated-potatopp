@@ -1,0 +1,238 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EmergencyBanner from '../components/EmergencyBanner.astro';
+import Header from '../components/Header.astro';
+import HeroSection from '../components/HeroSection.astro';
+import TrustBar from '../components/TrustBar.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import FaqAccordion from '../components/FaqAccordion.astro';
+import Reviews from '../components/Reviews.astro';
+import Footer from '../components/Footer.astro';
+import { CITIES } from '../data/cities';
+import { heroImageForCity } from '../data/heroImages';
+import { CITY_SERVICES } from '../data/services';
+import { jsonLd } from '../lib/jsonld';
+
+export function getStaticPaths() {
+  return CITIES.map(city => ({
+    params: { city: city.slug },
+    props: { cityData: city },
+  }));
+}
+
+const { cityData } = Astro.props;
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const firmName = 'Schlüsseldienst Schmidt';
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+
+// Reaktionszeit: nur die beiden Werte verwenden, die auf der Website bereits belegt sind.
+const isHeadquarters = cityData.distanceKm === 0;
+const responseTime = isHeadquarters ? 'unter 15 Min.' : '20–35 Min.';
+
+// Essen ist Hauptstandort UND Thema der Startseite. Damit beide Seiten nicht um
+// dasselbe Keyword konkurrieren (Kannibalisierung), ist die Startseite der breite
+// Marken- und Notdiensteinstieg, während diese Seite auf die Stadtteile zielt.
+// Bei langen Städtenamen (z.B. "Mülheim an der Ruhr") sprengt der volle Zusatz
+// die 62-Zeichen-Marke und wird in der SERP abgeschnitten.
+const titleSuffix = cityData.name.length > 18 ? '24h Notdienst' : '24h Türöffnung & Notdienst';
+const title = isHeadquarters
+  ? `Schlüsseldienst Essen – alle Stadtteile im Überblick`
+  : `Schlüsseldienst ${cityData.name} – ${titleSuffix}`;
+
+const description = isHeadquarters
+  ? `Schlüsseldienst für alle Essener Stadtteile — von Rüttenscheid über Steele bis Kettwig. Hauptstandort, kürzeste Anfahrt. Jetzt anrufen: ${phoneDisplay}`
+  : `Schlüsselnotdienst & Türöffnung in ${cityData.name}: 24h erreichbar, zerstörungsfreie Öffnung, Preisauskunft vor dem Einsatz. Jetzt anrufen: ${phoneDisplay}`;
+
+const citySchema = {
+  '@context': 'https://schema.org',
+  '@type': ['Locksmith', 'LocalBusiness'],
+  name: firmName,
+  telephone: phone,
+  url: `${siteUrl}/${cityData.slug}`,
+  priceRange: '€€',
+  openingHours: 'Mo-Su 00:00-24:00',
+  areaServed: {
+    '@type': 'City',
+    name: cityData.name,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: cityData.geo.lat,
+      longitude: cityData.geo.lng,
+    },
+  },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Essen',
+    addressRegion: 'Nordrhein-Westfalen',
+    addressCountry: 'DE',
+  },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: `Schlüsseldienst ${cityData.name}`, item: `${siteUrl}/${cityData.slug}` },
+  ],
+};
+
+const faqItems = [
+  {
+    question: `Wie schnell ist der Schlüsseldienst in ${cityData.name} vor Ort?`,
+    answer: `${cityData.name} liegt ${cityData.distanceKm} km von unserem Standort in Essen entfernt; als Richtwert planen Sie bitte ${responseTime} ein. Die tatsächliche Zeit hängt von Verkehrslage und Tageszeit ab — beim Anruf sagen wir Ihnen konkret, wann ein Techniker bei Ihnen sein kann. Unser Notdienst ist 24 Stunden täglich, 365 Tage im Jahr einsatzbereit.`,
+  },
+  {
+    question: `Was soll ich tun, wenn ich in ${cityData.name} ausgesperrt bin?`,
+    answer: `Bewahren Sie Ruhe und versuchen Sie nicht, die Tür gewaltsam zu öffnen. Kontaktieren Sie unseren Schlüsseldienst, schildern Sie Ihre Situation und wir schicken schnellstmöglich einen Monteur nach ${cityData.name}.`,
+  },
+  {
+    question: `Kann eine zugefallene Tür in ${cityData.name} beschädigungsfrei geöffnet werden?`,
+    answer: `In den meisten Fällen ja. Unsere Monteure öffnen Türen in ${cityData.name} mit professionellen Öffnungstechniken möglichst beschädigungsfrei. Sollte ein Schlossaustausch nötig sein, informieren wir Sie vorab.`,
+  },
+  {
+    question: `Bieten Sie in ${cityData.name} auch Schlossaustausch und Einbruchschutz an?`,
+    answer: `Ja. Neben der Notöffnung tauschen wir Schlösser aus, entfernen abgebrochene Schlüssel, öffnen Tresore und Wertschutzschränke, beraten zu Einbruchschutz und installieren auf Wunsch Sicherheitszylinder oder Schließanlagen — auch in ${cityData.name}.`,
+  },
+  {
+    question: `Sind Sie auch nachts und am Wochenende in ${cityData.name} erreichbar?`,
+    answer: `Ja. Unser Notdienst ist 24 Stunden täglich, 7 Tage die Woche und 365 Tage im Jahr erreichbar — auch an Heiligabend, Silvester und allen gesetzlichen Feiertagen in NRW.`,
+  },
+  {
+    question: `Was mache ich bei einem abgebrochenen Schlüssel in ${cityData.name}?`,
+    answer: `Versuchen Sie nicht, den Rest mit einer Zange herauszuziehen — das schiebt das Bruchstück meist tiefer in den Zylinder. Wir ziehen abgebrochene Schlüssel mit Spezialwerkzeug heraus und prüfen anschließend, ob der Zylinder weiter nutzbar ist oder ersetzt werden sollte.`,
+  },
+  {
+    question: `Welche Zahlungsmöglichkeiten gibt es in ${cityData.name}?`,
+    answer: `Je nach Einsatz können Sie bequem bar oder mit EC- bzw. Kreditkarte bezahlen. Sie erhalten nach dem Einsatz immer eine vollständige Rechnung.`,
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={`${siteUrl}/${cityData.slug}`} schema={citySchema} city={cityData.name}>
+  <script type="application/ld+json" slot="head" set:html={jsonLd(breadcrumbSchema)} />
+  <EmergencyBanner city={cityData.name} />
+  <Header city={cityData.name} citySlug={cityData.slug} />
+
+  <HeroSection
+    city={cityData.name}
+    headlineLead={isHeadquarters ? 'Schlüsseldienst Essen –' : 'Schlüsseldienst'}
+    headlineAccent={isHeadquarters ? 'alle Stadtteile' : cityData.name}
+    subtitle={isHeadquarters
+      ? `Von Rüttenscheid bis Kettwig: Essen ist unser Hauptstandort — hier sind wir am schnellsten vor Ort. Türöffnung zerstörungsfrei, rund um die Uhr.`
+      : `Ausgesperrt in ${cityData.name}? Tür zugefallen, Schlüssel verloren oder abgebrochen? Unser Schlüsselnotdienst öffnet Ihre Tür zerstörungsfrei — rund um die Uhr.`}
+    image={heroImageForCity(cityData.slug)}
+    responseTime={responseTime}
+  />
+  <TrustBar responseTime={responseTime} />
+
+  <!-- Stadtspezifischer Content -->
+  <section class="py-14 bg-white">
+    <div class="container-main max-w-4xl">
+
+      <!-- Breadcrumb -->
+      <nav aria-label="Breadcrumb" class="mb-8 text-sm text-gray-500">
+        <ol class="flex items-center gap-2">
+          <li class="text-gray-900 font-medium">
+            {isHeadquarters ? 'Essen & Stadtteile' : `Schlüsseldienst ${cityData.name}`}
+          </li>
+        </ol>
+      </nav>
+
+      <h2 class="section-title">
+        {isHeadquarters ? 'Schlüsseldienst in allen Essener Stadtteilen' : `Ihr Schlüsseldienst in ${cityData.name}`}
+      </h2>
+      <p class="text-gray-700 text-lg mb-6 leading-relaxed">{cityData.description}</p>
+
+      <p class="text-gray-700 mb-6 leading-relaxed">
+        Ob Sie unseren <strong>Schlüsselnotdienst</strong> nach einer zugefallenen Tür rufen oder einen
+        <strong>Aufsperrdienst</strong> suchen, weil der Schlüssel verloren gegangen oder im Schloss
+        abgebrochen ist — gemeint ist dieselbe Leistung: die schnelle, möglichst zerstörungsfreie
+        Öffnung Ihrer Tür. Den Preis nennen wir Ihnen am Telefon, bevor ein Techniker
+        nach {cityData.name} losfährt.
+      </p>
+
+      {cityData.districts && cityData.districts.length > 0 && (
+        <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
+          <h3 class="font-bold text-gray-900 mb-3">Stadtteile in {cityData.name} — alle abgedeckt:</h3>
+          <div class="flex flex-wrap gap-2">
+            {cityData.districts.map(district => (
+              <span class="bg-white border border-orange-200 text-orange-700 text-sm font-medium px-3 py-1 rounded-full">
+                {district}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <!-- Lokale Fact-Box (GEO-Signal: zitierfähige Fakten) -->
+      <blockquote class="border-l-4 border-orange-500 pl-5 py-2 my-8 bg-gray-50 rounded-r-xl" cite="https://www.destatis.de">
+        <p class="text-gray-700 italic text-sm">{cityData.localFact}</p>
+      </blockquote>
+
+      <!-- Entfernung & Reaktionszeit -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-10">
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">{cityData.distanceKm} km</div>
+          <div class="text-sm text-gray-600 mt-1">Entfernung von Essen</div>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">{responseTime}</div>
+          <div class="text-sm text-gray-600 mt-1">Reaktionszeit vor Ort</div>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">24/7</div>
+          <div class="text-sm text-gray-600 mt-1">Notdienst erreichbar</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="py-14 bg-gray-50">
+    <div class="container-main">
+      <h2 class="section-title text-center mb-10">Unsere Leistungen in {cityData.name}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto gap-6">
+        {CITY_SERVICES.map(s => (
+          <ServiceCard
+            title={`${s.shortName} ${cityData.name}`}
+            description={s.cardText}
+            icon={s.icon}
+            href={`/${cityData.slug}/${s.slug}`}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-14 bg-orange-600 text-white text-center">
+    <div class="container-main">
+      <h2 class="text-3xl font-black mb-4">Ausgesperrt in {cityData.name}?</h2>
+      <p class="text-orange-100 text-lg mb-8">Rufen Sie jetzt an — unser Notdienst ist rund um die Uhr für Sie erreichbar.</p>
+      <a href={`tel:${phone}`} class="bg-white text-orange-600 font-black text-2xl py-5 px-10 rounded-2xl hover:bg-orange-50 transition-colors inline-flex items-center gap-3 shadow-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+        {phoneDisplay}
+      </a>
+    </div>
+  </section>
+
+  <Reviews citySlug={cityData.slug} city={cityData.name} />
+
+  <FaqAccordion items={faqItems} city={cityData.name} />
+
+  <section class="py-8 bg-gray-50">
+    <div class="container-main text-center">
+      <p class="text-gray-600 text-sm">
+        Weitere Fragen zu {cityData.name}? Alle Antworten in der
+        <a href={`/${cityData.slug}/faq`} class="text-orange-600 font-semibold hover:underline">FAQ für {cityData.name} →</a>
+      </p>
+    </div>
+  </section>
+
+  <Footer city={cityData.name} citySlug={cityData.slug} />
+</BaseLayout>

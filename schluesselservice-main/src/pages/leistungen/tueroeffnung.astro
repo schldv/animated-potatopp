@@ -1,0 +1,429 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmergencyBanner from '../../components/EmergencyBanner.astro';
+import Header from '../../components/Header.astro';
+import FaqAccordion from '../../components/FaqAccordion.astro';
+import Footer from '../../components/Footer.astro';
+import HeroBackdrop from '../../components/HeroBackdrop.astro';
+import { jsonLd } from '../../lib/jsonld';
+
+const firmName = 'Schlüsseldienst Schmidt';
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+
+const title = `Türöffnung & Schlüsselnotdienst – 24h zerstörungsfrei`;
+const description = `Schlüsselnotdienst & Aufsperrdienst: zerstörungsfreie Türöffnung in 2–10 Minuten, 24h erreichbar, Preisauskunft vor dem Einsatz. Jetzt: ${phoneDisplay}`;
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'Wie läuft eine professionelle Türöffnung ab?',
+  description: 'Schritt-für-Schritt-Ablauf einer zerstörungsfreien Türöffnung durch einen professionellen Schlüsseldienst in Essen.',
+  totalTime: 'PT30M',
+  step: [
+    {
+      '@type': 'HowToStep',
+      position: 1,
+      name: 'Anruf & Preisauskunft',
+      text: 'Rufen Sie uns an. Wir nehmen Ihre Adresse auf, fragen nach Türtyp und Schloss und nennen Ihnen sofort den Preis — bevor wir losfahren.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 2,
+      name: 'Anfahrt des Technikers',
+      text: 'Der nächstgelegene Techniker fährt sofort zu Ihnen. Reaktionszeit im Essener Stadtgebiet: unter 15 Minuten.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 3,
+      name: 'Identitätsprüfung',
+      text: 'Zur Sicherheit weisen Sie sich mit einem Lichtbildausweis (Personalausweis oder Reisepass) aus und bestätigen, dass Sie zur Öffnung berechtigt sind.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 4,
+      name: 'Zerstörungsfreie Öffnung',
+      text: 'Mit Spezialwerkzeug (Picking-Set, Öffnungsnadeln) öffnen wir Ihre Tür in 2–10 Minuten ohne jede Beschädigung. In über 95% der Fälle ist keine weitere Maßnahme nötig — Tür und Schloss bleiben vollständig intakt.',
+    },
+    {
+      '@type': 'HowToStep',
+      position: 5,
+      name: 'Bezahlung & Quittung',
+      text: 'Sie bezahlen den genannten Preis (bar oder EC-Karte) und erhalten eine vollständige Quittung mit Leistungsbeschreibung.',
+    },
+  ],
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: 'Leistungen', item: `${siteUrl}/leistungen` },
+    { '@type': 'ListItem', position: 3, name: 'Türöffnung', item: `${siteUrl}/leistungen/tueroeffnung` },
+  ],
+};
+
+const faqItems = [
+  {
+    question: 'Wie schnell ist der Schlüsseldienst bei einer Türöffnung in Essen vor Ort?',
+    answer: 'Im Essener Stadtgebiet trifft unser Monteur häufig innerhalb von unter 15 Minuten bei Ihnen ein. Unser Notdienst ist 24 Stunden täglich, 365 Tage im Jahr erreichbar.',
+  },
+  {
+    question: 'Was kostet eine Türöffnung?',
+    answer: 'Die Kosten hängen von der Art der Tür, dem Schloss, dem Zeitpunkt und dem Aufwand ab. Wir nennen Ihnen den Preis immer vor Beginn der Arbeiten — keine versteckten Kosten, keine Nachforderungen.',
+  },
+  {
+    question: 'Kann jeder eine Türöffnung beauftragen?',
+    answer: 'Nein. Wir öffnen Türen ausschließlich für berechtigte Personen. Vor jedem Einsatz weisen Sie sich mit einem Lichtbildausweis (Personalausweis oder Reisepass) aus und bestätigen Ihre Berechtigung. Das schützt alle Beteiligten.',
+  },
+  {
+    question: 'Was bedeutet "zerstörungsfreie Öffnung"?',
+    answer: 'Bei einer zerstörungsfreien Öffnung wird das Schloss mit Spezialwerkzeug (Picking-Set, Öffnungsnadeln, Spannwerkzeug) geöffnet, ohne es zu beschädigen. Tür und Schloss bleiben vollständig intakt — anders als beim Aufbohren oder Aufbrechen. In über 95% aller Fälle ist diese Methode erfolgreich.',
+  },
+  {
+    question: 'Wie lange dauert eine Türöffnung?',
+    answer: 'Die eigentliche Öffnung dauert in der Regel 2–10 Minuten. Bei einfachen Profilzylindern oft weniger als 5 Minuten. Bei Hochsicherheitsschlössern kann es etwas länger dauern — wir informieren Sie vorab.',
+  },
+  {
+    question: 'Welche Türen und Schlösser können geöffnet werden?',
+    answer: 'Wir öffnen Wohnungstüren, Haustüren, Bürotüren, Kellertüren, Gartentore, Fahrzeugtüren und Tresore. Gängige Schlosstypen: Profilzylinder, Sicherheitsschloss (DIN EN 1303), Mehrfachverriegelung, Zimmertüren mit Buntbartschloss. In seltenen Ausnahmefällen informieren wir Sie immer vorab.',
+  },
+  {
+    question: 'Was passiert, wenn die Tür nicht zerstörungsfrei geöffnet werden kann?',
+    answer: 'In seltenen Fällen kann der Aufwand höher sein. Wir informieren Sie immer vor dem Eingriff und nennen die Optionen. Sie entscheiden, ob Sie weitermachen möchten.',
+  },
+  {
+    question: 'Öffnen Sie auch Autos, wenn der Schlüssel im Fahrzeug liegt?',
+    answer: 'In vielen Fällen ja. Ob eine Autoöffnung möglich ist, hängt vom Hersteller, Modell und Schließsystem ab: Fahrzeuge mit mechanischem Türschloss lassen sich häufig zerstörungsfrei öffnen, bei Keyless-Systemen ist das nicht immer der Fall. Nennen Sie uns beim Anruf Hersteller, Modell und Baujahr — dann sagen wir Ihnen vorab, ob wir helfen können. Halten Sie den Fahrzeugschein für die Berechtigungsprüfung bereit. Ist ein Kind oder Tier im Auto eingeschlossen, rufen Sie bitte sofort die 112.',
+  },
+  {
+    question: 'Ist ein Aufsperrdienst dasselbe wie ein Schlüsselnotdienst?',
+    answer: 'Im Alltag ja. "Aufsperrdienst" ist vor allem im süddeutschen und österreichischen Sprachraum gebräuchlich, "Schlüsselnotdienst" betont die Erreichbarkeit rund um die Uhr. Gemeint ist beide Male die Öffnung einer verschlossenen Tür ohne passenden Schlüssel. Bei uns erreichen Sie beides unter derselben Nummer.',
+  },
+  {
+    question: 'Woran erkenne ich einen unseriösen Schlüsseldienst?',
+    answer: 'Warnsignale: Kein Preis vor dem Einsatz, Preis explodiert nach der Öffnung, Techniker empfiehlt sofort Schlossaustausch ohne Begründung, keine vollständige Rechnung, keine Identitätsprüfung. Ein seriöser Anbieter nennt den Preis vorab, öffnet zerstörungsfrei und stellt eine Rechnung aus.',
+  },
+];
+---
+
+<BaseLayout title={title} description={description} canonical={`${siteUrl}/leistungen/tueroeffnung`} schema={howToSchema}>
+  <script type="application/ld+json" slot="head" set:html={jsonLd(breadcrumbSchema)} />
+  <EmergencyBanner />
+  <Header />
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 text-white py-16 md:py-24">
+    <HeroBackdrop
+      base="/images/leistungen/schluesseldienst-schmidt-tueroeffnung-notdienst"
+      widths={[800, 1400]}
+      width={1400}
+      height={1050}
+      alt="Techniker von Schlüsseldienst Schmidt öffnet eine verschlossene Wohnungstür"
+      objectPosition="object-[58%_20%]"
+      overlay="leicht"
+    />
+    <div class="relative container-main text-center max-w-2xl">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-gray-400 text-xs font-medium mb-7 tracking-wide uppercase">
+        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+        Notdienst aktiv — sofort erreichbar
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
+        Türöffnung Notdienst<br /><span class="text-orange-500">24h / 365 Tage</span>
+      </h1>
+      <p class="text-base text-gray-400 mb-10 leading-relaxed">Zerstörungsfreie Türöffnung in Essen und ganz NRW. Vor Ort in unter 15 Minuten. Preisauskunft immer vor dem Einsatz.</p>
+      <a href={`tel:${phone}`} class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-colors inline-flex items-center gap-2 text-lg shadow-lg shadow-orange-900/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+        {phoneDisplay}
+      </a>
+      <div class="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 text-xs text-gray-600 uppercase tracking-widest">
+        <span>Zerstörungsfrei</span>
+        <span class="text-gray-800">·</span>
+        <span>Preis vorab</span>
+        <span class="text-gray-800">·</span>
+        <span>Ausgebildete Schlosser</span>
+        <span class="text-gray-800">·</span>
+        <span>IHK-Mitglied</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="Brotkrumennavigation" class="bg-gray-50 border-b border-gray-100">
+    <div class="container-main py-3 text-xs text-gray-500">
+      <a href="/leistungen" class="hover:text-orange-600 transition-colors">Leistungen</a>
+      <span class="mx-2 text-gray-300">/</span>
+      <span class="text-gray-700 font-medium">Türöffnung</span>
+    </div>
+  </nav>
+
+  <!-- Definition / Intro (GEO-optimiert) -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title">Was ist ein Türöffnungs-Notdienst?</h2>
+      <div class="text-gray-700 space-y-4 leading-relaxed">
+        <p>
+          Ein <strong>Türöffnungs-Notdienst</strong> ist ein Schlüsseldienst, der ausgesperrten Personen rund um die Uhr hilft,
+          Zugang zu ihrer Wohnung, ihrem Haus oder Büro zu erlangen — ohne die Tür oder das Schloss zu beschädigen.
+        </p>
+        <p>
+          Die professionelle Methode ist das sogenannte <strong>Picking</strong>: Mit einem Picking-Set und Spannwerkzeug
+          werden die Schließpins im Zylinder einzeln angehoben, bis das Schloss sich öffnet — genauso wie mit dem richtigen Schlüssel,
+          nur ohne diesen. Erfahrene Techniker öffnen so einen Standard-Profilzylinder in 2–5 Minuten.
+        </p>
+        <p>
+          <strong>Schlüsseldienst Schmidt</strong> in Essen ist Ihr Fachbetrieb für Türöffnungen, Schlossaustausch und Einbruchschutz.
+          Unsere ausgebildeten Techniker erreichen bei Türöffnungen eine Zerstörungsfreiheitsquote von über 95%.
+        </p>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+        {[
+          { value: '< 15 Min.', label: 'Reaktionszeit Essen' },
+          { value: 'Preis vorab', label: 'Transparente Kosten' },
+          { value: '> 95%', label: 'Zerstörungsfrei' },
+          { value: '2–10 Min.', label: 'Öffnungsdauer' },
+        ].map(item => (
+          <div class="text-center bg-orange-50 rounded-xl p-5 border border-orange-100">
+            <div class="text-2xl font-black text-orange-600">{item.value}</div>
+            <div class="text-sm text-gray-600 mt-1">{item.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Begriffe: Schluesseldienst / Schluesselnotdienst / Aufsperrdienst -->
+  <section class="py-16 bg-white border-t border-gray-100">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title">Schlüsselnotdienst, Aufsperrdienst oder Schlüsseldienst?</h2>
+      <div class="text-gray-700 space-y-4 leading-relaxed">
+        <p>
+          Wer ausgesperrt ist, sucht selten nach dem gleichen Wort. Die drei gängigen Begriffe meinen
+          im Alltag dasselbe — es lohnt sich trotzdem zu wissen, worin sie sich unterscheiden:
+        </p>
+      </div>
+
+      <dl class="mt-8 space-y-4">
+        {[
+          {
+            term: 'Schlüsseldienst',
+            text: 'Der Oberbegriff für den gesamten Fachbetrieb — von der Notöffnung über den Schlossaustausch bis zu Schließanlagen und Einbruchschutz. Nicht jeder Schlüsseldienst fährt auch Notdienst.',
+          },
+          {
+            term: 'Schlüsselnotdienst',
+            text: 'Der Teil des Schlüsseldienstes, der rund um die Uhr ausrückt: nachts, am Wochenende und an Feiertagen. Wenn Sie um drei Uhr morgens vor der Tür stehen, suchen Sie genau das.',
+          },
+          {
+            term: 'Aufsperrdienst',
+            text: 'Ein vor allem im süddeutschen und österreichischen Sprachraum gebräuchliches Wort für dieselbe Leistung: das Aufsperren einer verschlossenen Tür ohne passenden Schlüssel.',
+          },
+        ].map(item => (
+          <div class="bg-gray-50 border border-gray-200 rounded-xl p-5">
+            <dt class="font-bold text-gray-900 mb-1">{item.term}</dt>
+            <dd class="text-gray-600 text-sm leading-relaxed">{item.text}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <p class="mt-6 text-gray-700 leading-relaxed">
+        Bei uns erreichen Sie alle drei unter einer Nummer. Ob die Tür zugefallen ist, der Schlüssel
+        verloren ging oder im Schloss abgebrochen ist — schildern Sie den Fall am Telefon, dann sagen wir
+        Ihnen, was zu tun ist und was es kostet.
+      </p>
+    </div>
+  </section>
+
+  <!-- Kostenhinweis -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title text-center mb-4">Transparente Kosten</h2>
+      <p class="text-center text-gray-600 mb-8">Die Kosten für eine Türöffnung hängen von verschiedenen Faktoren ab — Art der Tür, Schlosstyp, Zeitpunkt und Aufwand. Wir nennen Ihnen den genauen Preis immer <strong>vor</strong> Beginn der Arbeiten. Keine versteckten Kosten, keine Nachforderungen.</p>
+      <div class="bg-orange-50 border border-orange-200 rounded-2xl p-6 text-center">
+        <p class="text-gray-700 font-semibold mb-2">Jetzt Preisauskunft einholen</p>
+        <p class="text-gray-600 text-sm">Rufen Sie uns an — wir nennen Ihnen sofort den Preis für Ihren Einsatz, bevor wir losfahren.</p>
+        <a href={`tel:${phone}`} class="btn-call justify-center inline-flex mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+          </svg>
+          {phoneDisplay}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HowTo Ablauf -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title text-center mb-10">Wie läuft eine Türöffnung ab?</h2>
+      <div class="space-y-6" itemscope itemtype="https://schema.org/HowTo">
+        <meta itemprop="name" content="Wie läuft eine professionelle Türöffnung ab?" />
+        {[
+          { n: '1', title: 'Anruf & Preisauskunft', text: `Rufen Sie ${phoneDisplay} an. Wir nehmen Adresse, Türtyp und Schlosstyp auf und nennen Ihnen sofort den Preis — bevor wir losfahren.` },
+          { n: '2', title: 'Sofortige Anfahrt', text: 'Der nächstgelegene Techniker fährt sofort zu Ihnen. Durchschnittliche Reaktionszeit im Essener Stadtgebiet: unter 15 Minuten.' },
+          { n: '3', title: 'Identitätsprüfung vor Ort', text: 'Zur Sicherheit aller Beteiligten weisen Sie sich mit einem Lichtbildausweis (Personalausweis oder Reisepass) aus und bestätigen, dass Sie zur Öffnung berechtigt sind.' },
+          { n: '4', title: 'Zerstörungsfreie Öffnung (2–10 Min.)', text: 'Mit Picking-Set und Spezialwerkzeug öffnen wir Ihren Profilzylinder oder Sicherheitszylinder ohne jede Beschädigung — in der Regel in 2–10 Minuten.' },
+          { n: '5', title: 'Bezahlung & Rechnung', text: 'Sie zahlen den vorher genannten Preis (bar oder EC-Karte) und erhalten eine vollständige Rechnung mit Leistungsbeschreibung.' },
+        ].map(item => (
+          <div class="flex gap-5" itemscope itemprop="step" itemtype="https://schema.org/HowToStep">
+            <div class="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-black text-xl">
+              {item.n}
+            </div>
+            <div>
+              <h3 class="font-bold text-gray-900 mb-1" itemprop="name">{item.title}</h3>
+              <p class="text-gray-600 text-sm leading-relaxed" itemprop="text">{item.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Welche Türen öffnen wir -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title mb-6">Welche Türen und Schlösser öffnen wir?</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {[
+          { title: 'Wohnungstür / Haustür', text: 'Mit Profilzylinder oder Sicherheitszylinder — der häufigste Einsatztyp.' },
+          { title: 'Bürotür / Gewerbeimmobilie', text: 'Auch außerhalb der Geschäftszeiten, für Gewerbetreibende in ganz NRW.' },
+          { title: 'Kellertür / Garagentor', text: 'Separate Einheiten mit eigenem Schloss — kein Problem.' },
+          { title: 'Fahrzeugtür / Auto', text: 'In vielen Fällen möglich. Bitte beim Anruf Fahrzeugtyp und -modell nennen.' },
+          { title: 'Zimmertür / Innentür', text: 'Mit Buntbartschloss oder Drückergarnitur — schnell und schadlos.' },
+          { title: 'Tresor / Safe', text: 'Je nach Modell möglich. Beim Anruf Hersteller und Modell nennen.' },
+        ].map(item => (
+          <div class="bg-white border border-gray-200 rounded-xl p-5">
+            <h3 class="font-bold text-gray-900 mb-1 text-sm">🚪 {item.title}</h3>
+            <p class="text-gray-600 text-xs leading-relaxed">{item.text}</p>
+          </div>
+        ))}
+      </div>
+      <p class="mt-6 text-sm text-gray-500">
+        <strong>Schlosstypen:</strong> Profilzylinder, Sicherheitszylinder (DIN EN 1303), Mehrfachverriegelung, Buntbartschloss, Hebelschloss, Kastenschloss.
+      </p>
+    </div>
+  </section>
+
+  <!-- Autooeffnung -->
+  <section class="py-16 bg-white border-t border-gray-100">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title">Autoöffnung: Schlüssel im Fahrzeug eingeschlossen</h2>
+      <div class="text-gray-700 space-y-4 leading-relaxed">
+        <p>
+          Der Schlüssel liegt auf dem Fahrersitz, die Zentralverriegelung ist zu — die
+          <strong>Autoöffnung</strong> ist nach der Wohnungstür der zweithäufigste Aussperrfall. Auch hier
+          gilt: nicht selbst mit Draht oder Keil hantieren. Moderne Türdichtungen, Seitenairbags und
+          Kabelbäume im Türblatt sind empfindlich, und ein aufgehebelter Rahmen kostet mehr als der Einsatz.
+        </p>
+        <p>
+          Ob wir Ihr Fahrzeug öffnen können, hängt vom Modell und vom Schließsystem ab. Bei vielen
+          Fahrzeugen mit mechanischem Schloss gelingt die Öffnung zerstörungsfrei. Bei neueren Modellen mit
+          Keyless-Systemen oder verschlüsselter Wegfahrsperre ist eine Öffnung nicht immer möglich — in dem
+          Fall sagen wir Ihnen das direkt am Telefon, statt eine Anfahrt zu berechnen.
+        </p>
+      </div>
+
+      <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mt-8">
+        <h3 class="font-bold text-gray-900 mb-3 text-sm">Das brauchen wir beim Anruf</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+          {[
+            'Hersteller, Modell und Baujahr des Fahrzeugs',
+            'Ob es einen mechanischen Schlüssel oder ein Keyless-System hat',
+            'Wo das Fahrzeug steht — Straße, Parkhaus oder Tiefgarage',
+            'Fahrzeugschein oder ein anderer Eigentumsnachweis für die Berechtigungsprüfung',
+          ].map(item => (
+            <li class="flex gap-2.5 items-start">
+              <span class="text-orange-600 font-bold flex-shrink-0">•</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p class="mt-6 text-sm text-gray-500 bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <strong>Wichtig:</strong> Ist ein Kind oder ein Tier im Fahrzeug eingeschlossen, rufen Sie sofort
+        den Notruf <strong>112</strong>. Feuerwehr und Rettungsdienst sind in solchen Fällen schneller vor
+        Ort und dürfen die Scheibe öffnen — warten Sie nicht auf einen Schlüsseldienst.
+      </p>
+    </div>
+  </section>
+
+  <!-- Seriöser vs. unseriöser Schlüsseldienst -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-4xl">
+      <h2 class="section-title mb-3">Seriöser Schlüsseldienst — worauf kommt es an?</h2>
+      <p class="text-gray-600 mb-10 leading-relaxed">
+        Der Schlüsseldienst-Markt ist leider voll von unseriösen Anbietern. So erkennen Sie den Unterschied:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-sm border border-gray-200">
+
+        <!-- Schlüsseldienst Schmidt -->
+        <div class="bg-gray-900 text-white p-8">
+          <p class="text-orange-400 text-xs font-bold uppercase tracking-widest mb-2">Schlüsseldienst Schmidt</p>
+          <h3 class="text-xl font-black text-white mb-8">So arbeiten wir</h3>
+          <ul class="space-y-5">
+            {[
+              { label: 'Preisnennung', text: 'Verbindlich vor dem Einsatz — Sie entscheiden, bevor wir beginnen.' },
+              { label: 'Öffnungsmethode', text: 'Zerstörungsfreies Picking mit Spezialwerkzeug — Tür und Schloss bleiben intakt.' },
+              { label: 'Rechnung', text: 'Vollständige Rechnung mit Leistungsbeschreibung nach jedem Einsatz.' },
+              { label: 'Identitätsprüfung', text: 'Pflicht vor der Öffnung — schützt Sie und uns.' },
+              { label: 'Techniker', text: 'Ausgebildete Schlosser, keine Subunternehmer ohne Qualifikation.' },
+              { label: 'Zusatzleistungen', text: 'Nur auf Ihren Wunsch — wir drängen Ihnen nichts auf.' },
+            ].map(item => (
+              <li class="border-b border-white/10 pb-5 last:border-0 last:pb-0">
+                <div class="text-orange-400 text-xs font-semibold uppercase tracking-wide mb-1">{item.label}</div>
+                <div class="text-gray-300 text-sm leading-relaxed">{item.text}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- Warnsignale -->
+        <div class="bg-gray-50 p-8">
+          <p class="text-red-500 text-xs font-bold uppercase tracking-widest mb-2">Warnsignale</p>
+          <h3 class="text-xl font-black text-gray-900 mb-8">So erkennen Sie schwarze Schafe</h3>
+          <ul class="space-y-5">
+            {[
+              { label: 'Preisnennung', text: 'Kein Preis vor dem Einsatz — Abrechnung erst nach getaner Arbeit, oft zu überhöhten Beträgen.' },
+              { label: 'Öffnungsmethode', text: 'Aufbohren oder Aufbrechen ohne Notwendigkeit — erzeugt Folgekosten für Schloss und Tür.' },
+              { label: 'Rechnung', text: 'Keine oder unvollständige Rechnung — keine Handhabe bei Streitigkeiten.' },
+              { label: 'Identitätsprüfung', text: 'Wird übersprungen — wer auch immer zahlt, bekommt Zugang.' },
+              { label: 'Techniker', text: 'Ungelernte Subunternehmer ohne nachgewiesene Qualifikation.' },
+              { label: 'Zusatzleistungen', text: 'Schlossaustausch wird sofort empfohlen — oft ohne Notwendigkeit, um die Rechnung zu erhöhen.' },
+            ].map(item => (
+              <li class="border-b border-gray-200 pb-5 last:border-0 last:pb-0">
+                <div class="text-red-500 text-xs font-semibold uppercase tracking-wide mb-1">{item.label}</div>
+                <div class="text-gray-600 text-sm leading-relaxed">{item.text}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+      </div>
+
+      <p class="mt-5 text-sm text-gray-500 text-center">
+        Schlüsseldienst Schmidt — IHK-Mitglied, gewerblich haftpflichtversichert, ausgebildete Schlosser.
+      </p>
+    </div>
+  </section>
+
+  <FaqAccordion items={faqItems} city="Essen" />
+
+  <!-- Interner Link zu FAQ -->
+  <section class="py-8 bg-gray-50">
+    <div class="container-main text-center">
+      <p class="text-gray-600 text-sm">
+        Weitere Fragen? Alle Antworten finden Sie in unserer
+        <a href="/faq" class="text-orange-600 font-semibold hover:underline">vollständigen FAQ-Übersicht →</a>
+      </p>
+    </div>
+  </section>
+
+  <Footer />
+</BaseLayout>

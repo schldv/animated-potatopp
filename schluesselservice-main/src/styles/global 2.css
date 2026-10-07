@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+:root {
+  --color-primary: #e65c00;
+  --color-primary-dark: #c44f00;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.btn-primary {
+  @apply bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2.5 px-5 rounded-lg transition-colors duration-200 inline-block text-center text-sm;
+}
+
+.btn-call {
+  @apply bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-colors duration-200 inline-flex items-center gap-2 text-xl shadow-md;
+}
+
+.section-title {
+  @apply text-2xl md:text-3xl font-bold text-gray-900 mb-4;
+}
+
+.container-main {
+  @apply max-w-6xl mx-auto px-5 sm:px-8 lg:px-10;
+}

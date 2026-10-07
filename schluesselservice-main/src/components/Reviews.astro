@@ -1,0 +1,106 @@
+---
+/**
+ * Bewertungs-Sektion.
+ *
+ * Rendert NICHTS, solange keine echten Bewertungen in reviews.ts stehen —
+ * so bleibt die Seite sauber, statt mit einem leeren Platzhalter zu werben.
+ * Jede Bewertung zeigt ihre Quelle, damit sie nachprüfbar ist; genau das ist
+ * der Vertrauensgewinn gegenüber selbstgeschriebenen Zahlen.
+ */
+import { REVIEWS, AGGREGATE, reviewsForCity, type Review } from '../data/reviews';
+import { jsonLd } from '../lib/jsonld';
+
+export interface Props {
+  /** Wenn gesetzt, werden bevorzugt Bewertungen aus dieser Stadt gezeigt. */
+  citySlug?: string;
+  city?: string;
+  limit?: number;
+}
+
+const { citySlug, city, limit = 6 } = Astro.props;
+
+const local = citySlug ? reviewsForCity(citySlug) : [];
+const shown: Review[] = (local.length ? [...local, ...REVIEWS.filter(r => r.citySlug !== citySlug)] : REVIEWS)
+  .slice(0, limit);
+
+const heading = city && local.length
+  ? `Was Kunden in ${city} sagen`
+  : 'Was unsere Kunden sagen';
+
+// Nur ausgeben, wenn echte Bewertungen vorliegen.
+const reviewSchema = shown.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      itemListElement: shown.map((r, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'Review',
+          author: { '@type': 'Person', name: r.author },
+          datePublished: r.date,
+          reviewBody: r.text,
+          reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+        },
+      })),
+    }
+  : null;
+
+const fmt = (iso: string) =>
+  new Date(iso).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+---
+
+{shown.length > 0 && (
+  <>
+    {/*
+      KEIN slot="head": Diese Komponente ist kein direktes Kind von BaseLayout,
+      der Slot-Inhalt würde kommentarlos verworfen. JSON-LD im <body> ist gültig
+      und wird von Google gelesen — FaqAccordion macht es genauso.
+    */}
+    <script type="application/ld+json" set:html={jsonLd(reviewSchema)} />
+
+    <section class="py-16 bg-white">
+      <div class="container-main max-w-5xl">
+        <h2 class="section-title text-center mb-3">{heading}</h2>
+
+        {AGGREGATE && (
+          <p class="text-center text-gray-600 text-sm mb-10">
+            {AGGREGATE.ratingValue.toString().replace('.', ',')} von 5 Sternen aus {AGGREGATE.reviewCount} Bewertungen bei {AGGREGATE.source}
+            {AGGREGATE.url && (
+              <>
+                {' · '}
+                <a href={AGGREGATE.url} rel="noopener noreferrer" class="text-orange-600 font-semibold hover:underline">
+                  alle ansehen
+                </a>
+              </>
+            )}
+          </p>
+        )}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {shown.map(r => (
+            <figure class="bg-white rounded-xl border border-gray-200 p-6 flex flex-col">
+              <div class="flex items-center gap-1 mb-3" aria-label={`${r.rating} von 5 Sternen`}>
+                {[1, 2, 3, 4, 5].map(n => (
+                  <span class={n <= r.rating ? 'text-orange-500' : 'text-gray-300'}>★</span>
+                ))}
+              </div>
+              <blockquote class="text-gray-700 text-sm leading-relaxed flex-1">{r.text}</blockquote>
+              <figcaption class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                <span class="font-semibold text-gray-900">{r.author}</span>
+                {r.citySlug && <span> · {r.citySlug}</span>}
+                <span> · {fmt(r.date)}</span>
+                <span class="block mt-0.5">
+                  Quelle:{' '}
+                  {r.sourceUrl
+                    ? <a href={r.sourceUrl} rel="noopener noreferrer" class="text-orange-600 hover:underline">{r.source}</a>
+                    : r.source}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  </>
+)}

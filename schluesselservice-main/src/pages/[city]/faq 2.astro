@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmergencyBanner from '../../components/EmergencyBanner.astro';
+import Header from '../../components/Header.astro';
+import FaqAccordion from '../../components/FaqAccordion.astro';
+import Footer from '../../components/Footer.astro';
+import { CITIES } from '../../data/cities';
+import { CITY_SERVICES } from '../../data/services';
+import { jsonLd } from '../../lib/jsonld';
+import { cityGeneralFaq, responseTimeFor } from '../../lib/cityService';
+
+export function getStaticPaths() {
+  return CITIES.map(city => ({ params: { city: city.slug }, props: { city } }));
+}
+
+const { city } = Astro.props;
+const phone = '+49 201 000000';
+const phoneDisplay = '0201 000000';
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+const pageUrl = `${siteUrl}/${city.slug}/faq`;
+
+const title = `Häufige Fragen – Schlüsseldienst ${city.name}`;
+const description = `Antworten rund um den Schlüsseldienst in ${city.name}: Anfahrt, Kosten, Erreichbarkeit, Berechtigungsnachweis und Stadtteile. Jetzt anrufen: ${phoneDisplay}`;
+
+const faqItems = cityGeneralFaq(city, CITY_SERVICES.map(s => s.shortName));
+const responseTime = responseTimeFor(city);
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: `Schlüsseldienst ${city.name}`, item: `${siteUrl}/${city.slug}` },
+    { '@type': 'ListItem', position: 3, name: `Häufige Fragen ${city.name}`, item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout title={title} description={description} canonical={pageUrl} city={city.name}>
+  <script type="application/ld+json" slot="head" set:html={jsonLd(breadcrumbSchema)} />
+  <EmergencyBanner city={city.name} />
+  <Header city={city.name} citySlug={city.slug} />
+
+  <!-- Hero -->
+  <section class="bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 text-white py-16 md:py-24">
+    <div class="container-main text-center max-w-2xl">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-gray-400 text-xs font-medium mb-7 tracking-wide uppercase">
+        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+        Telefonisch erreichbar — 24h Notdienst
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
+        Häufige Fragen <span class="text-orange-500">{city.name}</span>
+      </h1>
+      <p class="text-base text-gray-400 leading-relaxed">
+        Die wichtigsten Antworten zu Anfahrt, Kosten und Ablauf in {city.name}.
+      </p>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="Brotkrumennavigation" class="bg-gray-50 border-b border-gray-100">
+    <div class="container-main py-3 text-xs text-gray-500">
+      <a href="/" class="hover:text-orange-600 transition-colors">Startseite</a>
+      <span class="mx-2 text-gray-300">/</span>
+      <a href={`/${city.slug}`} class="hover:text-orange-600 transition-colors">Schlüsseldienst {city.name}</a>
+      <span class="mx-2 text-gray-300">/</span>
+      <span class="text-gray-700 font-medium">Häufige Fragen</span>
+    </div>
+  </nav>
+
+  <!-- Eckdaten -->
+  <section class="py-14 bg-white">
+    <div class="container-main max-w-3xl">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">{city.distanceKm} km</div>
+          <div class="text-sm text-gray-600 mt-1">Entfernung von Essen</div>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">{responseTime}</div>
+          <div class="text-sm text-gray-600 mt-1">Richtwert Anfahrt</div>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">24/7</div>
+          <div class="text-sm text-gray-600 mt-1">Notdienst erreichbar</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <FaqAccordion items={faqItems} city={city.name} />
+
+  <!-- Leistungen dieser Stadt -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-5xl">
+      <h2 class="section-title text-center mb-10">Unsere Leistungen in {city.name}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {CITY_SERVICES.map(s => (
+          <a href={`/${city.slug}/${s.slug}`} class="bg-white rounded-xl border border-gray-200 p-6 hover:border-orange-400 transition-colors block">
+            <div class="text-3xl mb-3">{s.icon}</div>
+            <h3 class="font-bold text-gray-900 mb-1">{s.shortName} {city.name}</h3>
+            <p class="text-gray-600 text-sm">{s.cardText.split('.')[0]}.</p>
+          </a>
+        ))}
+      </div>
+      <p class="text-center mt-8 text-sm text-gray-600">
+        Ihre Frage nicht dabei? <a href={`/${city.slug}/kontakt`} class="text-orange-600 font-semibold hover:underline">Rufen Sie uns an →</a>
+      </p>
+    </div>
+  </section>
+
+  <Footer city={city.name} citySlug={city.slug} />
+</BaseLayout>

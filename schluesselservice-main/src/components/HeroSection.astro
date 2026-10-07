@@ -1,0 +1,92 @@
+---
+import type { HeroImage } from '../data/heroImages';
+import { heroAlt } from '../data/heroImages';
+import HeroBackdrop from './HeroBackdrop.astro';
+
+export interface Props {
+  city?: string;
+  subtitle?: string;
+  /** Optionales Hintergrundbild. Ohne Angabe bleibt der bisherige Verlauf. */
+  image?: HeroImage;
+  /** H1 überschreiben. Ohne Angabe: "Schlüsseldienst <Stadt>". */
+  headlineLead?: string;
+  headlineAccent?: string;
+  /**
+   * Reaktionszeit für das Trust-Badge. Ohne Angabe gilt der Essener Wert.
+   * Auf Stadtseiten MUSS der Wert der Stadt übergeben werden, sonst steht im
+   * Hero "unter 15 Min." und zwei Bildschirme tiefer "20–35 Min.".
+   */
+  responseTime?: string;
+}
+const {
+  city = 'Essen',
+  subtitle,
+  image,
+  headlineLead = 'Schlüsseldienst',
+  headlineAccent = city,
+  responseTime = 'Unter 15 Min.',
+} = Astro.props;
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const defaultSubtitle = subtitle ?? `Schlüssel vergessen oder ausgesperrt in ${city}? Wir öffnen Ihre Tür zerstörungsfrei — in unter 15 Minuten.`;
+---
+
+<section class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 text-white py-20 md:py-28">
+  {image && (
+    <HeroBackdrop
+      base={`/images/hero/${image.base}`}
+      widths={[900, 1600]}
+      width={image.width}
+      height={image.height}
+      alt={heroAlt(image, city)}
+      objectPosition={image.objectPosition}
+    />
+  )}
+
+  <div class="relative container-main text-center">
+
+    <!-- Badge -->
+    <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-gray-400 text-xs font-medium mb-8 tracking-wide uppercase">
+      <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+      Notdienst aktiv — sofort erreichbar
+    </div>
+
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-tight tracking-tight">
+      {headlineLead} <span class="text-orange-500">{headlineAccent}</span>
+    </h1>
+    <p class="text-2xl md:text-3xl font-light text-gray-300 mb-6">Türöffnung & Schlossservice — 24 / 7</p>
+
+    <p class="text-base md:text-lg text-gray-500 max-w-xl mx-auto mb-10 leading-relaxed">
+      {defaultSubtitle}
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+      <a
+        href={`tel:${phone}`}
+        class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-colors w-full sm:w-auto flex items-center justify-center gap-2 text-lg shadow-lg shadow-orange-900/30"
+        aria-label={`Schlüsseldienst ${city} jetzt anrufen: ${phoneDisplay}`}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+        {phoneDisplay}
+      </a>
+      <a href="/leistungen" class="border border-white/15 hover:border-white/40 text-gray-300 hover:text-white font-medium py-4 px-8 rounded-xl transition-colors w-full sm:w-auto text-center text-base">
+        Unsere Leistungen
+      </a>
+    </div>
+
+    <!-- Trust badges -->
+    <div class="mt-14 flex flex-wrap justify-center gap-x-8 gap-y-3 text-xs text-gray-600 uppercase tracking-widest">
+      <span>Preisauskunft vor Einsatz</span>
+      <span class="text-gray-800">·</span>
+      <span>{responseTime} vor Ort</span>
+      <span class="text-gray-800">·</span>
+      <span>Zerstörungsfreie Öffnung</span>
+      <span class="text-gray-800">·</span>
+      <span>24h / 365 Tage</span>
+    </div>
+
+  </div>
+</section>

@@ -1,0 +1,4 @@
+# Netlify/Cloudflare Pages — echter 301 statt Meta-Refresh.
+# Alter Slug enthielt einen Tippfehler (fehlendes "r").
+/leistungen/tresooeffnung   /leistungen/tresoroeffnung   301
+/leistungen/tresooeffnung/  /leistungen/tresoroeffnung   301

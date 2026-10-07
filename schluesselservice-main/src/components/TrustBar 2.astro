@@ -1,0 +1,46 @@
+---
+/**
+ * Vertrauensleiste.
+ *
+ * ⚠️ Hier stehen ausschließlich Aussagen, die der Kunde beim Einsatz selbst
+ * überprüfen kann. Die früheren Kacheln „4,9 ★ Kundenbewertung" und
+ * „10.000+ Einsätze" waren durch nichts belegt und wurden am 2026-09-07
+ * ersetzt — unbelegte Bewertungszahlen sind nach § 5b UWG angreifbar.
+ *
+ * Keine Statistik ohne Quelle ergänzen. Sobald ein Google Business Profile mit
+ * echten Bewertungen existiert, gehört die Gesamtwertung nach reviews.ts
+ * (AGGREGATE) und wird von Reviews.astro mit Quellenlink ausgegeben.
+ *
+ * Die Aussagen sind bewusst andere als die Trust-Badges im Hero (Preis,
+ * Reaktionszeit, Zerstörungsfreiheit, 24/7), damit nicht zweimal dasselbe
+ * direkt untereinander steht. Ausweisprüfung und vollständige Rechnung sind
+ * genau die Merkmale, die die Seriös-vs-Unseriös-Tabelle als Unterschied nennt.
+ */
+interface Props {
+  /**
+   * Reaktionszeit. Ohne Angabe gilt der Essener Wert — auf Stadtseiten muss
+   * der Wert der jeweiligen Stadt übergeben werden.
+   */
+  responseTime?: string;
+}
+const { responseTime = '< 15 Min' } = Astro.props;
+
+const items = [
+  { value: 'Ausweis', label: 'Prüfung vor jeder Öffnung' },
+  { value: responseTime, label: 'Reaktionszeit' },
+  { value: 'Rechnung', label: 'Nach jedem Einsatz' },
+  { value: '24 / 7', label: 'Notdienst · 365 Tage' },
+];
+---
+<section class="border-b border-gray-100 py-6 bg-white">
+  <div class="container-main">
+    <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
+      {items.map(item => (
+        <div class="text-center px-4 sm:px-6">
+          <div class="text-xl md:text-2xl font-black text-gray-900 mb-0.5">{item.value}</div>
+          <div class="text-xs font-medium text-gray-500 uppercase tracking-wide">{item.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

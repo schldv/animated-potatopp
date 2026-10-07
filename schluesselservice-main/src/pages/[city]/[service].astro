@@ -1,0 +1,262 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmergencyBanner from '../../components/EmergencyBanner.astro';
+import Header from '../../components/Header.astro';
+import HeroBackdrop from '../../components/HeroBackdrop.astro';
+import FaqAccordion from '../../components/FaqAccordion.astro';
+import Footer from '../../components/Footer.astro';
+import { CITIES } from '../../data/cities';
+import { CITY_SERVICES } from '../../data/services';
+import { jsonLd } from '../../lib/jsonld';
+import {
+  cityIntro,
+  cityFaq,
+  cityServiceTitle,
+  cityServiceDescription,
+  responseTimeFor,
+} from '../../lib/cityService';
+
+export function getStaticPaths() {
+  return CITIES.flatMap(city =>
+    CITY_SERVICES.map(service => ({
+      params: { city: city.slug, service: service.slug },
+      props: { city, service },
+    }))
+  );
+}
+
+const { city, service } = Astro.props;
+const firmName = 'Schlüsseldienst Schmidt';
+const phone = '+49 155 11447266';
+const phoneDisplay = '0155 11447266';
+const siteUrl = 'https://www.IHRE-DOMAIN.de';
+const pageUrl = `${siteUrl}/${city.slug}/${service.slug}`;
+
+const title = cityServiceTitle(city, service);
+const description = cityServiceDescription(city, service, phoneDisplay);
+const intro = cityIntro(city, service);
+const faqItems = [...cityFaq(city, service), ...service.faq];
+const responseTime = responseTimeFor(city);
+const otherServices = CITY_SERVICES.filter(s => s.slug !== service.slug);
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: `${service.shortName} ${city.name}`,
+  serviceType: service.shortName,
+  description,
+  url: pageUrl,
+  provider: {
+    '@type': ['Locksmith', 'LocalBusiness'],
+    name: firmName,
+    telephone: phone,
+    url: siteUrl,
+    priceRange: '€€',
+    openingHours: 'Mo-Su 00:00-24:00',
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Essen',
+      addressRegion: 'Nordrhein-Westfalen',
+      addressCountry: 'DE',
+    },
+  },
+  areaServed: {
+    '@type': 'City',
+    name: city.name,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: city.geo.lat,
+      longitude: city.geo.lng,
+    },
+  },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Startseite', item: siteUrl },
+    { '@type': 'ListItem', position: 2, name: `Schlüsseldienst ${city.name}`, item: `${siteUrl}/${city.slug}` },
+    { '@type': 'ListItem', position: 3, name: `${service.shortName} ${city.name}`, item: pageUrl },
+  ],
+};
+---
+
+<BaseLayout title={title} description={description} canonical={pageUrl} schema={serviceSchema} city={city.name}>
+  <script type="application/ld+json" slot="head" set:html={jsonLd(breadcrumbSchema)} />
+  <EmergencyBanner city={city.name} />
+  <Header city={city.name} citySlug={city.slug} />
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-orange-900 text-white py-16 md:py-24">
+    <HeroBackdrop
+      base={`/images/leistungen/${service.heroImage.base}`}
+      widths={[800, 1400]}
+      width={1400}
+      height={1050}
+      alt={`${service.heroImage.alt} in ${city.name}`}
+      objectPosition={service.heroImage.objectPosition}
+      overlay={service.heroImage.overlay}
+    />
+    <div class="relative container-main text-center max-w-2xl">
+      <div class="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-gray-300 text-xs font-medium mb-7 tracking-wide uppercase">
+        <span class="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+        Telefonisch erreichbar — 24h Notdienst
+      </div>
+      <h1 class="text-3xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
+        {service.shortName} <span class="text-orange-500">{city.name}</span>
+      </h1>
+      <p class="text-base text-gray-300 mb-10 leading-relaxed">{service.heroSub}</p>
+      <a href={`tel:${phone}`} class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 px-8 rounded-xl transition-colors inline-flex items-center gap-2 text-lg shadow-lg shadow-orange-900/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+        </svg>
+        {phoneDisplay}
+      </a>
+    </div>
+  </section>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="Brotkrumennavigation" class="bg-gray-50 border-b border-gray-100">
+    <div class="container-main py-3 text-xs text-gray-500">
+      <a href={`/${city.slug}`} class="hover:text-orange-600 transition-colors">Schlüsseldienst {city.name}</a>
+      <span class="mx-2 text-gray-300">/</span>
+      <span class="text-gray-700 font-medium">{service.shortName}</span>
+    </div>
+  </nav>
+
+  <!-- Stadtspezifischer Einstieg -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title">{service.shortName} in {city.name}</h2>
+      <div class="text-gray-700 space-y-4 leading-relaxed">
+        {intro.map(p => <p>{p}</p>)}
+      </div>
+
+      <blockquote class="border-l-4 border-orange-500 pl-5 py-2 my-8 bg-gray-50 rounded-r-xl">
+        <p class="text-gray-700 italic text-sm">{city.localFact}</p>
+      </blockquote>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">{city.distanceKm} km</div>
+          <div class="text-sm text-gray-600 mt-1">Entfernung von Essen</div>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">{responseTime}</div>
+          <div class="text-sm text-gray-600 mt-1">Richtwert Anfahrt</div>
+        </div>
+        <div class="text-center bg-gray-50 rounded-xl p-5 border border-gray-200">
+          <div class="text-2xl font-black text-orange-600">24/7</div>
+          <div class="text-sm text-gray-600 mt-1">Notdienst erreichbar</div>
+        </div>
+      </div>
+
+      {city.districts && city.districts.length > 0 && (
+        <div class="bg-orange-50 border border-orange-200 rounded-xl p-6 mt-8">
+          <h3 class="font-bold text-gray-900 mb-3">Stadtteile in {city.name} — alle abgedeckt:</h3>
+          <div class="flex flex-wrap gap-2">
+            {city.districts.map(d => (
+              <span class="bg-white border border-orange-200 text-orange-700 text-sm font-medium px-3 py-1 rounded-full">{d}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- Was die Leistung umfasst -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title">{service.introHeading}</h2>
+      <div class="text-gray-700 space-y-4 leading-relaxed">
+        {service.introParagraphs.map(p => <p set:html={p} />)}
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
+        {service.kpis.map(item => (
+          <div class="text-center bg-white rounded-xl p-5 border border-orange-100">
+            <div class="text-xl font-black text-orange-600">{item.value}</div>
+            <div class="text-sm text-gray-600 mt-1">{item.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Anwendungsfälle -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-5xl">
+      <h2 class="section-title text-center mb-10">{service.casesHeading}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {service.cases.map(item => (
+          <div class="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 class="font-bold text-gray-900 mb-2">{item.title}</h3>
+            <p class="text-gray-600 text-sm leading-relaxed">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Ablauf -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title text-center mb-10">{service.stepsHeading}</h2>
+      <div class="space-y-6">
+        {service.steps.map((item, i) => (
+          <div class="flex gap-5">
+            <div class="flex-shrink-0 w-12 h-12 bg-orange-600 text-white rounded-full flex items-center justify-center font-black text-xl">{i + 1}</div>
+            <div>
+              <h3 class="font-bold text-gray-900 mb-1">{item.title}</h3>
+              <p class="text-gray-600 text-sm leading-relaxed">{item.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Kosten & CTA -->
+  <section class="py-16 bg-white">
+    <div class="container-main max-w-3xl">
+      <h2 class="section-title text-center mb-4">Was kostet eine {service.shortName} in {city.name}?</h2>
+      <p class="text-center text-gray-600 mb-8">{service.costText}</p>
+      <div class="bg-orange-50 border border-orange-200 rounded-2xl p-6 text-center">
+        <p class="text-gray-700 font-semibold mb-2">Preisauskunft am Telefon</p>
+        <p class="text-gray-600 text-sm">Schildern Sie uns Ihren Fall in {city.name} — wir nennen Ihnen den Preisrahmen, bevor ein Techniker losfährt.</p>
+        <a href={`tel:${phone}`} class="btn-call justify-center inline-flex mt-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+          </svg>
+          {phoneDisplay}
+        </a>
+        <p class="mt-3 text-xs text-gray-500">24 Stunden täglich, 365 Tage im Jahr</p>
+      </div>
+    </div>
+  </section>
+
+  <FaqAccordion items={faqItems} city={city.name} />
+
+  <!-- Weitere Leistungen in dieser Stadt -->
+  <section class="py-16 bg-gray-50">
+    <div class="container-main max-w-5xl">
+      <h2 class="section-title text-center mb-10">Weitere Leistungen in {city.name}</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {otherServices.map(s => (
+          <a href={`/${city.slug}/${s.slug}`} class="bg-white rounded-xl border border-gray-200 p-6 hover:border-orange-400 transition-colors block">
+            <div class="text-3xl mb-3">{s.icon}</div>
+            <h3 class="font-bold text-gray-900 mb-1">{s.shortName}</h3>
+            <p class="text-gray-600 text-sm">{s.cardText.split('.')[0]}.</p>
+          </a>
+        ))}
+      </div>
+      <p class="text-center mt-8">
+        <a href={`/${city.slug}`} class="text-orange-600 font-semibold hover:underline text-sm">
+          Übersicht: Schlüsseldienst {city.name} →
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <Footer city={city.name} citySlug={city.slug} />
+</BaseLayout>
