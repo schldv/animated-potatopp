@@ -1,6 +1,5 @@
-# To better understand this file read this:
-# https://docs.ionos.space/docs/github-actions-customization/
 
+# IONOS Deploy Now
 name: "Deploy Now: Execute Build"
 
 on:
@@ -17,17 +16,31 @@ env:
   DEPLOYMENT_FOLDER: schluesselservice-main/dist
 
 jobs:
-# Please do not rename this job
+  # Please do not rename this job
   build-project:
     name: build animated-potatopp
     runs-on: ubuntu-latest
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
         with:
           submodules: 'recursive'
 
-# Please do not touch the following action
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        working-directory: schluesselservice-main
+        run: npm ci
+
+      - name: Build website
+        working-directory: schluesselservice-main
+        run: npm run build
+
+      # Please do not touch the following action
       - name: Store deployment content
         uses: ionos-deploy-now/artifact-action@v1
         with:
