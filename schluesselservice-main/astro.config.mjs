@@ -7,7 +7,7 @@ import sitemap from '@astrojs/sitemap';
 const NOINDEX_PATHS = ['/impressum', '/datenschutz', '/schluessel-regionen'];
 
 export default defineConfig({
-  site: 'https://www.IHRE-DOMAIN.de',
+  site: 'https://www.schlüsseldienst-schmidt24.de',
   output: 'static',
   vite: {
     plugins: [tailwindcss()],
